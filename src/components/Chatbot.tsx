@@ -62,7 +62,7 @@ export default function Chatbot() {
       {chatOpen && (
         <div
           ref={containerRef!}
-          className="max-h-[600px] fixed bottom-[5vh] right-[2vw] z-[1000] flex max-w-[31.25rem] flex-col overflow-hidden rounded-2xl border border-white/35 shadow-2xl backdrop-blur-xl saturate-150"
+          className="max-h-[600px] fixed bottom-[5vh] right-[2vw] z-1000 flex max-w-125 flex-col overflow-hidden rounded-2xl border border-white/35 shadow-2xl backdrop-blur-xl saturate-150"
           style={{ opacity }}
         >
           {/* Header */}
