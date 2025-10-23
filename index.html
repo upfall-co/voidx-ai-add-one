@@ -4,10 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>voidx-ai-add-one</title>
+    <title>SDK 테스트 페이지</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <h1>여기는 개발용 테스트 HTML입니다.</h1>
+    <div id="voidx-ai-addon-root"></div>
+    <script type="module">
+      import { init } from '/src/main.tsx';
+      init({
+        apiKey: 'DEV-TEST-API-KEY-123'
+      });
+    </script>
   </body>
 </html>

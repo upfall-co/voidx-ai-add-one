@@ -1,0 +1,39 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import "tailwindcss";
+* {
+  font-family: "pretendard";
+}
+.nudge-product-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.nudge-product-price {
+  font-weight: 700;
+  color: #5b5b5b;
+}
+.nudge-separator {
+  border: none;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 8px 0;
+}
+.nudge-summary-intro {
+  font-size: 0.8rem;
+  color: #5b5b5b;
+}
+.nudge-summary-points {
+  font-size: 0.85rem;
+  color: #333;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 0;
+}
+.nudge-prompt {
+  font-size: 0.8rem;
+  color: #10a2dc;
+  font-weight: 600;
+  margin-top: 12px;
+}
