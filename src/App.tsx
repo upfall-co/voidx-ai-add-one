@@ -10,12 +10,5 @@ export default function App({ apiKey }: AppProps) {
     console.log(apiKey);
   }, [apiKey]);
 
-  return (
-    <div className="relative">
-      <VoidxProvider />
-      <h1>안녕하세요! 님의 SDK입니다.</h1>
-      <p>전달받은 API Key: {apiKey || "없음"}</p>
-      <button onClick={() => alert("SDK 버튼 클릭!")}>테스트 버튼</button>
-    </div>
-  );
+  return <VoidxProvider />;
 }

@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@react-spring/three": "^10.0.3",
     "@react-three/drei": "^10.0.8",
     "@react-three/fiber": "^9.1.2",
     "@types/three": "^0.176.0",

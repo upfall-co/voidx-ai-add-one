@@ -4,10 +4,8 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths"; // 1. 플러그인 임포트
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tsconfigPaths(), // 2. 플러그인 실행
-  ],
+  plugins: [react(), tsconfigPaths()],
+
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/Main.tsx"),
