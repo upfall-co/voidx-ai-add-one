@@ -11,7 +11,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, "src/Main.tsx"),
       name: "voidx-ai-addon",
       fileName: (format) => `voidx-ai-addon.${format}.js`,
-      formats: ["umd", "es"],
+      formats: ["es"],
     },
   },
 });

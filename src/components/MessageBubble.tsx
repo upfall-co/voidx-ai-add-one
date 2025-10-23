@@ -1,4 +1,4 @@
-import type { MessageRole } from '@/stores/voidxAgentStore';
+import type { MessageRole } from "@/stores/voidxAgentStore";
 import clsx from "clsx";
 
 export default function MessageBubble({
@@ -14,7 +14,7 @@ export default function MessageBubble({
   const userClass =
     "bg-black/90 text-white self-end rounded-lg rounded-br-none";
   const botClass =
-    "bg-white/45 text-black self-start rounded-lg rounded-bl-none";
+    "bg-white/90 text-black self-start rounded-lg rounded-bl-none";
   return (
     <div
       className={clsx(commonClass, {

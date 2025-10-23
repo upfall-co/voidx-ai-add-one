@@ -5,6 +5,7 @@ import { useVoidxAgentStore } from "@/stores/voidxAgentStore";
 import { useEffect, useMemo, useState } from "react";
 import Chatbot from "./Chatbot";
 import CursorAgent from "./CursorAgent";
+import NudgePopup from "./NudgePopup";
 
 export default function VoidxProvider() {
   const { current } = useMouse();
@@ -13,11 +14,22 @@ export default function VoidxProvider() {
   const isSleeping = useVoidxAgentStore((s) => s.isSleeping);
   const chatOpen = useVoidxAgentStore((s) => s.chatOpen);
   const donutProgress = useVoidxAgentStore((s) => s.donutProgress);
+  const addMessage = useVoidxAgentStore((s) => s.addMessage);
+
+  const setChatOpen = useVoidxAgentStore((s) => s.setChatOpen);
+
+  useEffect(() => {
+    setChatOpen(true);
+    addMessage({ role: "user", content: "Hello!", type: "nudge" });
+  }, []);
 
   const [nudgePosition, setNudgePosition] = useState<{
     x: number;
     y: number;
-  } | null>();
+  } | null>({
+    x: current.x,
+    y: current.y,
+  });
 
   const nudgeList = useMemo(
     () => messages.filter((msg) => msg.type === "nudge"),
@@ -44,6 +56,11 @@ export default function VoidxProvider() {
           nudgeList={nudgeList}
         />
       )} */}
+      <NudgePopup
+        initialX={nudgePosition.x}
+        initialY={nudgePosition.y}
+        nudgeList={nudgeList}
+      />
       <Chatbot />
       {!isSleeping && <CursorAgent />}
       {/* <DonutGauge isVisible={isDonut} progress={donutProgress} /> */}

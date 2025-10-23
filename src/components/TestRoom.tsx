@@ -1,5 +1,8 @@
 "use client";
 
+const dracoUrl = `${cdnUrl}/3d/level-react-draco.glb`;
+
+import { cdnUrl } from "@/constant/common";
 import { useVoidxAgentStore } from "@/stores/voidxAgentStore";
 import { a, useSpring } from "@react-spring/three";
 import {
@@ -26,48 +29,40 @@ export default function TestRoom() {
   }, [setIsSleeping]);
 
   return (
-    <div className="relative w-full h-full">
-      <button
-        className="absolute z-20 px-8 py-4 text-xl font-black text-white transition -translate-x-1/2 bg-blue-400 rounded-full bottom-10 left-1/2 hover:bg-blue-500"
-        onClick={() => setIsSleeping(!isSleeping)}
+    <Suspense fallback={null}>
+      <Canvas
+        dpr={[1, 2]}
+        camera={{ fov: 15, position: [0, 0, 10] }}
+        style={{ touchAction: "none" }}
       >
-        Switching
-      </button>
-      <Suspense fallback={null}>
-        <Canvas
-          dpr={[1, 2]}
-          camera={{ fov: 25, position: [0, 0, 8] }}
-          style={{ touchAction: "none" }}
+        <ambientLight intensity={2} />
+        <directionalLight position={[10, 8, 5]} />
+        <PresentationControls
+          global
+          zoom={0.8}
+          rotation={[0, -Math.PI / 4, 0]}
+          polar={[0, Math.PI / 4]}
+          azimuth={[-Math.PI / 4, Math.PI / 4]}
+          cursor={false}
         >
-          <ambientLight intensity={2} />
-          <directionalLight position={[10, 10, 5]} />
-          <PresentationControls
-            global
-            zoom={0.8}
-            rotation={[0, -Math.PI / 4, 0]}
-            polar={[0, Math.PI / 4]}
-            azimuth={[-Math.PI / 4, Math.PI / 4]}
-            cursor={false}
-          >
-            <group position-y={-0.75} dispose={null}>
-              {isSleeping && <AgentModel url={agentUrl} />}
-              <Camera />
-              <Level />
-              <Cactus onSelect={setSelectedObject} />
-              <Icon onSelect={setSelectedObject} />
-              <Sudo onSelect={setSelectedObject} />
-              <Pyramid onSelect={setSelectedObject} />
-            </group>
-          </PresentationControls>
-          <RendererCleanup />
-        </Canvas>
-      </Suspense>
-    </div>
+          <group position-y={-1} dispose={null}>
+            {isSleeping && <AgentModel url={agentUrl} />}
+            <Camera />
+            <Level />
+            <Cactus onSelect={setSelectedObject} />
+            <Icon onSelect={setSelectedObject} />
+            <Sudo onSelect={setSelectedObject} />
+            <Pyramid onSelect={setSelectedObject} />
+          </group>
+        </PresentationControls>
+        <RendererCleanup />
+      </Canvas>
+    </Suspense>
   );
 }
 
 function Sudo({ onSelect }: { onSelect: (name: string) => void }) {
-  const { nodes } = useGLTF("/level-react-draco.glb");
+  const { nodes } = useGLTF(dracoUrl);
 
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
@@ -135,7 +130,7 @@ function Sudo({ onSelect }: { onSelect: (name: string) => void }) {
 }
 
 function Cactus({ onSelect }: { onSelect: (name: string) => void }) {
-  const { nodes, materials } = useGLTF("/level-react-draco.glb");
+  const { nodes, materials } = useGLTF(dracoUrl);
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
 
@@ -169,7 +164,7 @@ function Cactus({ onSelect }: { onSelect: (name: string) => void }) {
 }
 
 function Camera() {
-  const { nodes, materials } = useGLTF("/level-react-draco.glb");
+  const { nodes, materials } = useGLTF(dracoUrl);
   const [spring, api] = useSpring(
     () => ({ "rotation-z": 0, config: { friction: 40 } }),
     []
@@ -202,7 +197,7 @@ function Camera() {
 }
 
 function Icon({ onSelect }: { onSelect: (name: string) => void }) {
-  const { nodes } = useGLTF("/level-react-draco.glb");
+  const { nodes } = useGLTF(dracoUrl);
   const [matcap] = useMatcapTexture("65A0C7_C3E4F8_A7D5EF_97CAE9", 1024);
 
   const [hovered, setHovered] = useState(false);
@@ -253,7 +248,7 @@ function Icon({ onSelect }: { onSelect: (name: string) => void }) {
 }
 
 function Pyramid({ onSelect }: { onSelect: (name: string) => void }) {
-  const { nodes } = useGLTF("/level-react-draco.glb");
+  const { nodes } = useGLTF(dracoUrl);
   const [matcap] = useMatcapTexture("489B7A_A0E7D9_6DC5AC_87DAC7", 1024);
 
   const [hovered, setHovered] = useState(false);
@@ -307,7 +302,7 @@ function Pyramid({ onSelect }: { onSelect: (name: string) => void }) {
 }
 
 function Level() {
-  const { nodes } = useGLTF("/level-react-draco.glb");
+  const { nodes } = useGLTF(dracoUrl);
   const { camera } = useThree();
   useSpring(
     () => ({
