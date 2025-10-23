@@ -9,7 +9,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/Main.tsx"),
-      name: "voidx-ai-addon",
+      name: "VoidxAIAddon",
       fileName: (format) => `voidx-ai-addon.${format}.js`,
       formats: ["es"],
     },

@@ -35,10 +35,10 @@ export default function VoidxProvider() {
     () => messages.filter((msg) => msg.type === "nudge"),
     [messages]
   );
-  const isDonut = useMemo(
-    () => donutProgress > 0 && donutProgress < 100,
-    [donutProgress]
-  );
+  // const isDonut = useMemo(
+  //   () => donutProgress > 0 && donutProgress < 100,
+  //   [donutProgress]
+  // );
 
   useEffect(() => {
     if (nudgeList.length === 1) {
