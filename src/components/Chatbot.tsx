@@ -1,4 +1,4 @@
-import { cdnIconUrl, cdnUrl } from "@/constant/common";
+import { cdnIconUrl } from "@/constant/common";
 import {
   useAgentAnimations,
   type AgentAnimation,
@@ -6,10 +6,10 @@ import {
 import useDraggable from "@/hooks/useDraggable";
 import { useVoidxAgentStore } from "@/stores/voidxAgentStore";
 import { useGLTF } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Group, type Object3DEventMap } from "three";
 import MessageBubble from "./MessageBubble";
+import TestRoom from "./TestRoom";
 
 const sendIcon = cdnIconUrl("icon-chatbot-send");
 
@@ -61,7 +61,7 @@ export default function Chatbot() {
     <>
       {chatOpen && (
         <div
-          ref={containerRef!}
+          ref={containerRef}
           className="max-h-[600px] fixed bottom-[5vh] right-[2vw] z-1000 flex max-w-125 flex-col overflow-hidden rounded-2xl border border-white/35 shadow-2xl backdrop-blur-xl saturate-150"
           style={{ opacity }}
         >
@@ -118,7 +118,7 @@ export default function Chatbot() {
                 )} */}
               </button>
               <button
-                className="rounded-md  hover:bg-black/10"
+                className="rounded-md hover:bg-black/10"
                 onClick={() => setChatOpen(false)}
               >
                 {/* <XMarkIcon className="w-4 h-4" /> */}
@@ -128,25 +128,7 @@ export default function Chatbot() {
 
           {/* 3D Agent View */}
           <div className="relative mx-6 mt-6 h-[300px] shrink-0">
-            {isSleeping && agentUrl && (
-              <Canvas className="absolute inset-0 z-10 rounded-xl">
-                <ambientLight intensity={1} />
-                <directionalLight
-                  castShadow
-                  position={[0, 10, 10]}
-                  intensity={1}
-                />
-                <SleepAgent modelPath={agentUrl} onInteract={() => {}} />
-              </Canvas>
-            )}
-            <img
-              src={
-                backgroundUrl ||
-                `${cdnUrl}/beauty-demo/assets/level1/background.webp`
-              }
-              alt="background"
-              className="absolute inset-0 object-cover w-full h-full rounded-xl"
-            />
+            <TestRoom />
           </div>
 
           {/* Level & EXP Bar */}
@@ -177,7 +159,7 @@ export default function Chatbot() {
           {/* Input Area */}
           <div className="relative px-4 pt-2 pb-4 mt-2 shrink-0">
             {quickButtons.length > 0 && (
-              <div className="absolute left-4 right-4 -top-10 flex gap-2 pb-1 mb-3 overflow-x-auto backdrop-blur-xl backdrop-saturate-150">
+              <div className="absolute flex gap-2 pb-1 mb-3 overflow-x-auto left-4 right-4 -top-10 backdrop-blur-xl backdrop-saturate-150">
                 {quickButtons.map((button, index) => (
                   <button
                     key={index}
@@ -210,7 +192,7 @@ export default function Chatbot() {
       {!chatOpen && chatbotButtonUrl && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-[6vh] right-[2vw] z-[999] h-16 w-16 animate-pulse rounded-full bg-white p-0 shadow-lg hover:animate-none"
+          className="fixed bottom-[6vh] right-[2vw] z-999 cursor-pointer h-16 w-16 animate-pulse rounded-full bg-black p-0 shadow-lg hover:animate-none"
           style={{ animation: "rotate-slow 15s linear infinite" }}
         >
           <img
