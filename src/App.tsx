@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import "./assets/css/App.module.css";
+import "./assets/styles/App.module.css";
 import VoidxProvider from "./components/VoidxProvider";
 
 interface AppProps {
@@ -12,7 +12,7 @@ export default function App({ apiKey }: AppProps) {
   }, [apiKey]);
 
   return (
-    <div>
+    <div className="bg-red-500">
       <VoidxProvider />
       <h1>안녕하세요! 님의 SDK입니다.</h1>
       <p>전달받은 API Key: {apiKey || "없음"}</p>
