@@ -1,19 +1,28 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SDK 테스트 페이지</title>
-  </head>
-  <body>
-    <h1>여기는 개발용 테스트 HTML입니다.</h1>
-    <div id="voidx-ai-addon-root"></div>
-    <script type="module">
-      import { init } from '/src/main.tsx';
-      init({
-        apiKey: 'DEV-TEST-API-KEY-123'
-      });
-    </script>
-  </body>
-</html>
+<body>
+  <!-- 기존 React 앱 -->
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- ✅ 여기 두 줄은 반드시 </body> 위(= 안쪽)에! -->
+  <div id="voidx-ai-addon-root"></div>
+  <script type="module">
+    console.log("[voidx] init script start");
+    import("https://cdn.voidx.ai/voidx-ai-addon.es.js")
+      .then(({ init }) => {
+        console.log("[voidx] library loaded");
+        init({ apiKey: "pk_test_your_publishable_key" });
+        console.log("[voidx] init called");
+      })
+      .catch((e) => console.error("[voidx] load failed:", e));
+  </script>
+
+  <!-- 네이버 SDK (기존) -->
+  <script
+    defer
+    charset="UTF-8"
+    src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js"
+  ></script>
+
+  <!-- 이건 body 밖에 두면 안 보일 수 있음! 꼭 body 안으로 이동 -->
+  <div id="modal-root"></div>
+</body>

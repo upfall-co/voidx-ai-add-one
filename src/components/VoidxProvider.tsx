@@ -11,22 +11,23 @@ export default function VoidxProvider() {
 
   const messages = useVoidxAgentStore((s) => s.messages);
   const isSleeping = useVoidxAgentStore((s) => s.isSleeping);
-  const chatOpen = useVoidxAgentStore((s) => s.chatOpen);
-  const donutProgress = useVoidxAgentStore((s) => s.donutProgress);
+  // const chatOpen = useVoidxAgentStore((s) => s.chatOpen);
+  // const donutProgress = useVoidxAgentStore((s) => s.donutProgress);
 
   const [nudgePosition, setNudgePosition] = useState<{
     x: number;
     y: number;
   } | null>();
+  console.log("VoidxProvider rendered", nudgePosition);
 
   const nudgeList = useMemo(
     () => messages.filter((msg) => msg.type === "nudge"),
     [messages]
   );
-  const isDonut = useMemo(
-    () => donutProgress > 0 && donutProgress < 100,
-    [donutProgress]
-  );
+  // const isDonut = useMemo(
+  //   () => donutProgress > 0 && donutProgress < 100,
+  //   [donutProgress]
+  // );
 
   useEffect(() => {
     if (nudgeList.length === 1) {
