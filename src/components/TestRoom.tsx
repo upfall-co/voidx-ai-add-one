@@ -26,7 +26,7 @@ export default function TestRoom() {
   const [selectedObject, setSelectedObject] = useState<string | null>(null);
 
   useEffect(() => {
-    setIsSleeping(true);
+    setIsSleeping(false);
   }, [setIsSleeping]);
 
   return (
