@@ -21,6 +21,7 @@ export default function TestRoom() {
   const isSleeping = useVoidxAgentStore((s) => s.isSleeping);
   const setIsSleeping = useVoidxAgentStore((s) => s.setIsSleeping);
   const agentUrl = useVoidxAgentStore((s) => s.agentUrl);
+  console.log("[voidx] dracoUrl =", dracoUrl);
 
   const [selectedObject, setSelectedObject] = useState<string | null>(null);
 
