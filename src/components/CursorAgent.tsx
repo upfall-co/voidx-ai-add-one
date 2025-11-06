@@ -1,5 +1,3 @@
-"use client";
-
 import {
   useCursorFollow,
   useCursorFollowForMobile,
@@ -37,9 +35,11 @@ export default function CursorAgent() {
       style={{
         position: "absolute",
         zIndex: 100000,
-        width: "100%",
-        height: "100%",
         pointerEvents: "none",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0,
       }}
     >
       <ambientLight intensity={0.3} />
