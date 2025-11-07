@@ -1,4 +1,5 @@
 import { useAgentStore } from "@/stores/agentStore";
+import { useMessageStore } from "@/stores/messageStore"; // 1. messageStore 임포트
 import { useSmartPopupStore } from "@/stores/smartPopupStore";
 import { motion, useDragControls } from "framer-motion";
 import {
@@ -23,7 +24,15 @@ const estimatedWidth = popupSize.width;
 const estimatedHeight = popupSize.height;
 
 export default function SmartNudgePopup() {
-  const nudgeList = [];
+  // 2. messageStore에서 메시지 가져오기
+  const allMessages = useMessageStore((s) => s.messages);
+  const addMessage = useMessageStore((s) => s.addMessage); // 3. addMessage 가져오기
+
+  // 4. 'nudge' 타입의 메시지만 필터링
+  const nudgeList = useMemo(
+    () => allMessages.filter((msg) => msg.type === "nudge"),
+    [allMessages]
+  );
 
   const isOpen = useSmartPopupStore((s) => s.isOpen);
   const { x: initialX, y: initialY } = useSmartPopupStore((s) => s.position);
@@ -77,7 +86,7 @@ export default function SmartNudgePopup() {
       adjustedY = margin;
     }
     return { initialLeft: adjustedX, initialTop: adjustedY };
-  }, [initialX, initialY, popupSize.width, popupSize.height]);
+  }, [initialX, initialY, estimatedWidth, estimatedHeight]);
 
   const handleClose = () => {
     setIsFocus(false);
@@ -89,6 +98,8 @@ export default function SmartNudgePopup() {
   const submitMessage = () => {
     const content = inputValue.trim();
     if (!content) return;
+    // 5. 메시지 전송 로직 수정 (type: 'nudge' 추가)
+    addMessage({ role: "user", content, type: "nudge" });
     setInputValue("");
   };
 
@@ -128,7 +139,7 @@ export default function SmartNudgePopup() {
       top: messageListRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [isExpanded]);
+  }, [isExpanded, nudgeList]); // 6. nudgeList 변경 시 스크롤
 
   if (!isOpen) return null;
 
@@ -231,17 +242,20 @@ export default function SmartNudgePopup() {
               메시지가 없습니다.
             </div>
           )}
-          <button
-            className="self-center mt-2 text-black/30"
-            type="button"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <FaChevronUp className="w-3 h-3" />
-            ) : (
-              <FaChevronDown className="w-3 h-3" />
-            )}
-          </button>
+          {/* 7. 메시지가 1개 초과일 때만 확장 버튼 표시 */}
+          {nudgeList.length > 1 && (
+            <button
+              className="self-center mt-2 text-black/30"
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? (
+                <FaChevronUp className="w-3 h-3" />
+              ) : (
+                <FaChevronDown className="w-3 h-3" />
+              )}
+            </button>
+          )}
         </div>
 
         <form

@@ -1,8 +1,8 @@
 import { useChatbotStore } from "@/stores/chatbotStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
-import MessageBubble from '../popup/MessageBubble';
+import { useEffect, useMemo, useRef } from "react";
+import MessageBubble from "../popup/MessageBubble";
 
 const chatListVariants = {
   hidden: { x: "100%", opacity: 0 },
@@ -11,17 +11,22 @@ const chatListVariants = {
 };
 
 export default function ChattingList() {
-  const messages = useMessageStore((s) => s.messages);
+  const allMessages = useMessageStore((s) => s.messages);
   const opacity = useChatbotStore((s) => s.opacity);
   const mode = useChatbotStore((s) => s.mode);
 
   const chattingBodyRef = useRef<HTMLDivElement>(null);
 
+  const chatMessages = useMemo(
+    () => allMessages.filter((msg) => msg.type === "chat"),
+    [allMessages]
+  );
+
   useEffect(() => {
     if (chattingBodyRef.current) {
       chattingBodyRef.current.scrollTop = chattingBodyRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [chatMessages]);
 
   return (
     <AnimatePresence>
@@ -41,7 +46,7 @@ export default function ChattingList() {
               className="flex flex-col h-full gap-3 p-4 overflow-y-auto"
               style={{ opacity }}
             >
-              {messages.map((msg, i) => (
+              {chatMessages.map((msg, i) => (
                 <MessageBubble key={i} role={msg.role}>
                   {msg.content}
                 </MessageBubble>
