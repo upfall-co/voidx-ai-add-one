@@ -63,8 +63,8 @@ export default function ChatbotToolbar() {
           </button>
         </div>
       </div>
-      <div className="relative w-full h-4 bg-[#c9c9c9] border border-white/60 rounded-full flex items-center pl-4">
-        <p className="text-xs text-white">
+      <div className="relative w-full h-4 bg-[#c9c9c9] border border-white/60 rounded-full flex items-center">
+        <p className="absolute text-xs text-white left-4">
           Lv.{agentLevel >= 5 ? "MAX" : agentLevel}
         </p>
         <div
