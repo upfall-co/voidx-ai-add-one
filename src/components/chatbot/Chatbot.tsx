@@ -1,10 +1,15 @@
 "use client";
 
+import { useAgentStore } from "@/stores/agentStore"; // 4. 임포트
 import { useChatbotStore } from "@/stores/chatbotStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useInteractionStore } from "@/stores/scenarioStore";
+import { ContactShadows, useGLTF } from "@react-three/drei"; // 3. 임포트
+import { Canvas } from "@react-three/fiber"; // 2. 임포트
+import clsx from "clsx"; // 8. 임포트
 import {
   type KeyboardEvent,
+  Suspense,
   useEffect,
   useMemo,
   useRef,
@@ -12,12 +17,12 @@ import {
 } from "react";
 import { PiPaperPlaneFill } from "react-icons/pi";
 import { useSwipeable } from "react-swipeable";
-import ArkModel from "./ArkModel";
+import { ArkModelScene } from "./ArkModelScene";
 import ChattingList from "./ChattingList";
 import GestureTutorial from "./GestureTutorual";
+import SleepingAgentModel from "./SleepingAgent"; // 6. 임포트
 import ChatbotToolbar from "./Toolbar";
-import View360 from "./View360";
-// import View360 from "./View360"; // 1. View360 제거
+import { View360Scene } from "./View360Scen";
 
 export default function Chatbot() {
   const isOpen = useChatbotStore((s) => s.isOpen);
@@ -27,9 +32,14 @@ export default function Chatbot() {
   const setMode = useChatbotStore((s) => s.setMode);
   const setInput = useChatbotStore((s) => s.setInput);
   const setIsOpen = useChatbotStore((s) => s.setIsOpen);
+  const arkGlb = useChatbotStore((s) => s.arkGlb);
 
   const messages = useMessageStore((s) => s.messages);
   const addMessage = useMessageStore((s) => s.addMessage);
+
+  // 9. asleep, glb 상태 가져오기
+  const asleep = useAgentStore((s) => s.asleep);
+  const glb = useAgentStore((s) => s.glb);
 
   const level = useInteractionStore((s) => s.level);
   const setLevel = useInteractionStore((s) => s.setLevel);
@@ -53,6 +63,8 @@ export default function Chatbot() {
   }, [messages]);
 
   const lastChatMessage = chatMessages[chatMessages.length - 1];
+
+  useGLTF.preload(arkGlb);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
@@ -88,7 +100,6 @@ export default function Chatbot() {
     const content = input.trim();
     if (!content) return;
     setLevel(level + 0.1);
-    // 5. 'chat' 타입으로 메시지 전송
     addMessage({ role: "user", content, type: "chat" });
     setInput("");
   };
@@ -132,14 +143,55 @@ export default function Chatbot() {
 
           <div
             {...handlers}
-            className="relative h-[300px] shrink-0 touch-none cursor-grab active:cursor-grabbing"
+            // 10. 3D 캔버스 컨테이너
+            className={clsx(
+              "relative h-[300px] shrink-0 touch-none cursor-grab active:cursor-grabbing",
+              mode === "chatting" && "opacity-30" // 11. 채팅 시 투명도 적용
+            )}
           >
+            <Suspense fallback={null}>
+              {/* 12. 단일 캔버스 */}
+              <Canvas
+                dpr={[1, 2]}
+                camera={
+                  mode === "360"
+                    ? { fov: 20, position: [0, 0, 10] } // 360 모드 카메라
+                    : { fov: 6.5, position: [15, 6, 15] } // 기본 모드 카메라
+                }
+                style={{ touchAction: "none" }}
+              >
+                {/* 13. 모드에 따라 Scene 분기 */}
+                {mode === "360" ? (
+                  <View360Scene />
+                ) : (
+                  <>
+                    {/* Ark/Sleeping Scene */}
+                    <ContactShadows
+                      position={[0, -0.2, 0]}
+                      opacity={0.7}
+                      scale={2.5}
+                      blur={8}
+                      far={2}
+                    />
+                    <ambientLight intensity={1} />
+                    <directionalLight position={[10, 10, 5]} intensity={2.0} />
+                    <directionalLight
+                      position={[-10, 10, -5]}
+                      intensity={0.2}
+                    />
+                    {asleep && <SleepingAgentModel url={glb} />}
+                    <ArkModelScene url={arkGlb} />
+                  </>
+                )}
+              </Canvas>
+            </Suspense>
+
+            {/* 14. 2D UI 오버레이 */}
             <GestureTutorial step={tutorialStep} isOpen={isOpen} />
-            <ArkModel />
             <ChattingList />
-            <View360 />
           </div>
 
+          {/* ... (form 부분은 동일) ... */}
           <form
             ref={formRef}
             onSubmit={handleSubmit}

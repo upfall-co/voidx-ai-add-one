@@ -1,9 +1,6 @@
-"use client";
-
 const dracoUrl = `${cdnUrl}/3d/level-react-draco.glb`;
 
 import { cdnUrl } from "@/constant/common";
-import { useChatbotStore } from "@/stores/chatbotStore";
 import { a, useSpring } from "@react-spring/three";
 import {
   MeshWobbleMaterial,
@@ -12,66 +9,32 @@ import {
   useGLTF,
   useMatcapTexture,
 } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
-import { AnimatePresence, motion } from "framer-motion";
-import { Suspense, useEffect, useState } from "react";
+import { useThree } from "@react-three/fiber";
+import { useEffect, useState } from "react";
 import * as THREE from "three";
 
 useGLTF.preload(dracoUrl);
 
-export default function View360() {
-  const chatListVariants = {
-    hidden: { y: "100%", opacity: 0 },
-    visible: { y: "0%", opacity: 1 },
-    exit: { y: "100%", opacity: 0 },
-  };
-
-  const mode = useChatbotStore((s) => s.mode);
-
-  if (mode !== "360") return null;
-
+export function View360Scene() {
   return (
-    <AnimatePresence>
-      <motion.div
-        key="chatting-list"
-        variants={chatListVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="absolute inset-0 z-10 w-full h-full"
+    <>
+      <ambientLight intensity={2} />
+      <directionalLight position={[10, 8, 5]} />
+      <group
+        rotation={[0, -Math.PI / 4, 0]}
+        position={[0, -1, 0]}
+        dispose={null}
       >
-        <div className="relative w-full h-full touch-none flex items-center justify-center">
-          <h1 className="absolute z-1 text-white font-black text-4xl shadow-inner">
-            360 View
-          </h1>
-          <Suspense fallback={null}>
-            <Canvas
-              dpr={[1, 2]}
-              camera={{ fov: 20, position: [0, 0, 10] }}
-              style={{ touchAction: "none" }}
-            >
-              <ambientLight intensity={2} />
-              <directionalLight position={[10, 8, 5]} />
-              <group
-                rotation={[0, -Math.PI / 4, 0]}
-                position={[0, -1, 0]}
-                dispose={null}
-              >
-                <Camera />
-                <Level />
-                <Cactus />
-                <Icon />
-                <Sudo />
-                <Pyramid />
-              </group>
-              <RendererCleanup />
-              <OrbitControls />
-            </Canvas>
-          </Suspense>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        <Camera />
+        <Level />
+        <Cactus />
+        <Icon />
+        <Sudo />
+        <Pyramid />
+      </group>
+      {/* 6. RendererCleanup 컴포넌트 호출 제거 */}
+      <OrbitControls />
+    </>
   );
 }
 
@@ -309,16 +272,4 @@ function Level() {
       rotation={[Math.PI / 2, -Math.PI / 9, 0]}
     />
   );
-}
-
-function RendererCleanup() {
-  const { gl } = useThree();
-
-  useEffect(() => {
-    return () => {
-      gl.dispose();
-    };
-  }, [gl]);
-
-  return null;
 }

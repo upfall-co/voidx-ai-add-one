@@ -1,5 +1,3 @@
-"use client";
-
 import { useCursorFollow } from "@/hooks/useCursorFollow";
 import { useInteractionStore } from "@/stores/scenarioStore";
 import { useAnimations, useGLTF } from "@react-three/drei";
@@ -9,9 +7,13 @@ import { LevelUpEffect } from "./LevelUpEffect";
 
 type CursorAgentModelProps = {
   url: string;
+  asleep: boolean; // 1. asleep prop 타입 추가
 };
 
-export default function CursorAgentModel({ url }: CursorAgentModelProps) {
+export default function CursorAgentModel({
+  url,
+  asleep,
+}: CursorAgentModelProps) {
   const [isChange, setIsChange] = useState(false);
   const agentRef = useRef<THREE.Group>(null!);
   const level = useInteractionStore((s) => s.level);
@@ -32,13 +34,20 @@ export default function CursorAgentModel({ url }: CursorAgentModelProps) {
   }, [level]);
 
   return (
-    <group ref={agentRef} position={[0, 0, 0]} rotation={[0, 0, 0]} scale={0.6}>
+    <group
+      ref={agentRef}
+      position={[0, 0, 0]}
+      rotation={[0, 0, 0]}
+      scale={0.6}
+      visible={!asleep} //
+    >
       {isChange && <LevelUpEffect />}
       <GhostScene url={url} />
     </group>
   );
 }
 
+// ... (GhostScene 코드는 변경 없음)
 export function GhostScene({ url }: { url: string }) {
   const level = useInteractionStore((s) => s.level);
   const groupRef = useRef<THREE.Group>(null!);

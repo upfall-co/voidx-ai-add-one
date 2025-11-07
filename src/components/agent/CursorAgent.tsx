@@ -1,5 +1,3 @@
-"use client";
-
 import { useAgentStore } from "@/stores/agentStore";
 import { Environment, useGLTF } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -23,7 +21,7 @@ export default function CursorAgent() {
     return () => clearTimeout(timer);
   }, [glb]);
 
-  if (!agent || asleep) return null;
+  if (!agent) return null;
 
   return (
     <Canvas
@@ -44,7 +42,8 @@ export default function CursorAgent() {
     >
       <ambientLight intensity={0.3} />
       <Suspense fallback={null}>
-        <CursorAgentModel url={agent} />
+        {/* 2. asleep 상태를 모델 컴포넌트로 전달 */}
+        <CursorAgentModel url={agent} asleep={asleep} />
         <Environment preset="warehouse" />
       </Suspense>
     </Canvas>
