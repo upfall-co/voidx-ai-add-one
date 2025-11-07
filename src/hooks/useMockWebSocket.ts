@@ -3,9 +3,7 @@ import { useMessageStore } from "@/stores/messageStore";
 import { useSmartPopupStore } from "@/stores/smartPopupStore";
 import { useEffect, useRef } from "react";
 
-// 가상 챗봇 응답 딜레이 (ms)
 const CHAT_RESPONSE_DELAY = 1000;
-// 가상 넛지 팝업 트리거 딜레이 (ms)
 const NUDGE_TRIGGER_DELAY = 5000;
 
 export function useMockWebSocket() {
@@ -55,8 +53,7 @@ export function useMockWebSocket() {
       return () => clearTimeout(timer);
     }
   }, [messages, addMessage]);
-
-  // Effect 3: 마운트 시 1회 넛지 트리거
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       const { isOpen, mode, setMode } = useChatbotStore.getState();
@@ -77,10 +74,18 @@ export function useMockWebSocket() {
           setMode("chatting");
         }
       } else {
+        // --- 여기부터 수정 ---
+        console.log(
+          "[MockWebSocket] 챗봇이 닫혀있어 넛지 팝업을 트리거합니다."
+        );
         setPosition({
           x: window.innerWidth / 2 - 200, // 팝업 너비 400의 절반
           y: window.innerHeight / 2 - 100, // 팝업 높이 200의 절반
         });
+
+        // [수정] 이 줄이 누락되었습니다.
+        setIsOpen(true);
+
         addMessage({
           role: "bot",
           content: `(시뮬레이션) 🤖
@@ -88,9 +93,11 @@ export function useMockWebSocket() {
 궁금한 점을 물어보세요!`,
           type: "nudge",
         });
+        // --- 여기까지 수정 ---
       }
     }, NUDGE_TRIGGER_DELAY);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addMessage, setIsOpen, setPosition]); // 마운트 시 1회만 실행
 }

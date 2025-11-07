@@ -35,10 +35,12 @@ export const useMessageStore = create<
 >((set) => ({
   messages: [],
   setMessages: (messages) => set({ messages }),
+
   addMessage: (newMessage) =>
     set((state) => {
       const newId = generateUUID();
-      const messagesToAdd: ClientMessage[] = [{ ...newMessage, id: newId }];
+      const messagesToAdd: ClientMessage[] = [];
+
       if (newMessage.type === "nudge") {
         messagesToAdd.push({
           ...newMessage,
@@ -46,6 +48,9 @@ export const useMessageStore = create<
           id: generateUUID(),
         });
       }
+
+      messagesToAdd.push({ ...newMessage, id: newId });
+
       return {
         messages: [...state.messages, ...messagesToAdd],
       };
