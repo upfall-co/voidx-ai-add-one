@@ -1,7 +1,7 @@
 import { cdnUrl } from "@/constant/common";
 import { create } from "zustand";
 
-type ChatbotMode = "360" | "chatting" | "sleeping";
+type ChatbotMode = "chatting" | "sleeping";
 
 type ChatbotState = {
   isOpen: boolean;

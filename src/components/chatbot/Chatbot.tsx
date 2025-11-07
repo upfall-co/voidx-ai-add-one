@@ -16,7 +16,7 @@ import ArkModel from "./ArkModel";
 import ChattingList from "./ChattingList";
 import GestureTutorial from "./GestureTutorual";
 import ChatbotToolbar from "./Toolbar";
-import View360 from "./View360";
+// import View360 from "./View360"; // 1. View360 제거
 
 export default function Chatbot() {
   const isOpen = useChatbotStore((s) => s.isOpen);
@@ -48,6 +48,7 @@ export default function Chatbot() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const chatMessages = useMemo(() => {
+    // 2. 'chat' 타입만 필터링 (ChattingList.tsx에서도 하지만 이중 체크)
     return messages.filter((msg) => msg.type === "chat");
   }, [messages]);
 
@@ -62,21 +63,12 @@ export default function Chatbot() {
     },
     onSwipedRight: () => {
       if (mode === "chatting") {
-        if (tutorialStep === 1) setTutorialStep(2);
+        // 3. 튜토리얼 스텝 2(360)로 가는 로직 제거
+        // if (tutorialStep === 1) setTutorialStep(2);
         setMode("sleeping");
       }
     },
-    onSwipedUp: () => {
-      if (mode === "sleeping") {
-        if (tutorialStep === 2) setTutorialStep(3);
-        setMode("360");
-      }
-    },
-    onSwipedDown: () => {
-      if (mode === "360") {
-        setMode("sleeping");
-      }
-    },
+    // 4. onSwipedUp, onSwipedDown 핸들러 제거
     delta: 10,
     preventScrollOnSwipe: true,
     trackTouch: true,
@@ -87,6 +79,7 @@ export default function Chatbot() {
     const content = input.trim();
     if (!content) return;
     setLevel(level + 0.1);
+    // 5. 'chat' 타입으로 메시지 전송
     addMessage({ role: "user", content, type: "chat" });
     setInput("");
   };
@@ -135,7 +128,8 @@ export default function Chatbot() {
             <GestureTutorial step={tutorialStep} isOpen={isOpen} />
             <ArkModel />
             <ChattingList />
-            <View360 />
+            {/* 6. View360 컴포넌트 제거 */}
+            {/* <View360 /> */}
           </div>
 
           <form
