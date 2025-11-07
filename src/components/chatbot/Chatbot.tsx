@@ -4,7 +4,7 @@ import { useAgentStore } from "@/stores/agentStore"; // 4. 임포트
 import { useChatbotStore } from "@/stores/chatbotStore";
 import { useMessageStore } from "@/stores/messageStore";
 import { useInteractionStore } from "@/stores/scenarioStore";
-import { ContactShadows, useGLTF } from "@react-three/drei"; // 3. 임포트
+import { ContactShadows } from "@react-three/drei"; // 3. 임포트
 import { Canvas } from "@react-three/fiber"; // 2. 임포트
 import clsx from "clsx"; // 8. 임포트
 import {
@@ -32,7 +32,6 @@ export default function Chatbot() {
   const setMode = useChatbotStore((s) => s.setMode);
   const setInput = useChatbotStore((s) => s.setInput);
   const setIsOpen = useChatbotStore((s) => s.setIsOpen);
-  const arkGlb = useChatbotStore((s) => s.arkGlb);
 
   const messages = useMessageStore((s) => s.messages);
   const addMessage = useMessageStore((s) => s.addMessage);
@@ -63,8 +62,6 @@ export default function Chatbot() {
   }, [messages]);
 
   const lastChatMessage = chatMessages[chatMessages.length - 1];
-
-  useGLTF.preload(arkGlb);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
@@ -180,7 +177,7 @@ export default function Chatbot() {
                       intensity={0.2}
                     />
                     {asleep && <SleepingAgentModel url={glb} />}
-                    <ArkModelScene url={arkGlb} />
+                    <ArkModelScene />
                   </>
                 )}
               </Canvas>

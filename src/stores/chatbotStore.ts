@@ -21,11 +21,6 @@ type ChatbotActions = {
   setInput: (input: string) => void;
 };
 
-/**
- * arkPreview: `${cdnUrl}/2d/ark_model_00.webp`,
- * arkGlb: `${cdnUrl}/3d/ark_model_00.glb`,
- */
-
 export const useChatbotStore = create<ChatbotState & ChatbotActions>((set) => ({
   isOpen: false,
   opacity: 1,
