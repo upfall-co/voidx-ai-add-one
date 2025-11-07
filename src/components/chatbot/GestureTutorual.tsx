@@ -64,7 +64,7 @@ export default function GestureTutorial({
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="absolute inset-0 z-20 w-full h-full bg-[#2c2c2c]/70 rounded-2xl flex flex-col items-center justify-center text-white"
+          className="absolute z-1 w-full h-4/5 translate-y-1/2 bg-[#2c2c2c]/70 rounded-2xl flex flex-col items-center justify-center text-white"
         >
           {step === 0 && (
             <div className="text-center flex flex-col items-center justify-center w-full h-full gap-4">
