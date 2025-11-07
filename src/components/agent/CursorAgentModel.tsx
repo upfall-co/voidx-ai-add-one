@@ -17,7 +17,7 @@ export default function CursorAgentModel({ url }: CursorAgentModelProps) {
   const level = useInteractionStore((s) => s.level);
   const prevLevelRef = useRef(Math.floor(level));
 
-  useCursorFollow(agentRef, { moveSpeed: 5 });
+  useCursorFollow(agentRef);
 
   useEffect(() => {
     const currentLevelInt = Math.floor(level);
@@ -32,12 +32,7 @@ export default function CursorAgentModel({ url }: CursorAgentModelProps) {
   }, [level]);
 
   return (
-    <group
-      ref={agentRef}
-      position={[0, 0.5, 0]}
-      rotation={[0, 0, 0]}
-      scale={0.6}
-    >
+    <group ref={agentRef} position={[0, 0, 0]} rotation={[0, 0, 0]} scale={0.6}>
       {isChange && <LevelUpEffect />}
       <GhostScene url={url} />
     </group>

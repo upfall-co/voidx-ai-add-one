@@ -24,24 +24,31 @@ const estimatedHeight = popupSize.height;
 
 export default function SmartNudgePopup() {
   const nudgeList = [];
-  const lastMessage = nudgeList[nudgeList.length - 1] || {
-    role: "system",
-    content: "아직 받은 메시지가 없습니다.",
-    contentType: "text",
-  };
 
+  const isOpen = useSmartPopupStore((s) => s.isOpen);
   const { x: initialX, y: initialY } = useSmartPopupStore((s) => s.position);
+  const opacity = useSmartPopupStore((s) => s.opacity);
+  const isExpanded = useSmartPopupStore((s) => s.isExpanded);
+  const inputValue = useSmartPopupStore((s) => s.inputValue);
+  const isPin = useSmartPopupStore((s) => s.isPin);
+
+  const setIsExpanded = useSmartPopupStore((s) => s.setIsExpanded);
+  const setInputValue = useSmartPopupStore((s) => s.setInputValue);
+  const setOpacity = useSmartPopupStore((s) => s.setOpacity);
+  const setIsPin = useSmartPopupStore((s) => s.setIsPin);
+
+  const [isFocus, setIsFocus] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   const asleep = useAgentStore((s) => s.asleep);
   const setAsleep = useAgentStore((s) => s.setAsleep);
-  const isMobile = useMemo(() => window.innerWidth < 768, []);
 
-  const [isPin, setIsPin] = useState(false);
-  const [isFocus, setIsFocus] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const [opacity, setOpacity] = useState(1);
-  const [inputValue, setInputValue] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
+  const lastMessage = useMemo(
+    () => nudgeList[nudgeList.length - 1],
+    [nudgeList]
+  );
+
+  const isMobile = useMemo(() => window.innerWidth < 768, []);
 
   const dragControls = useDragControls();
 
@@ -122,6 +129,8 @@ export default function SmartNudgePopup() {
       behavior: "smooth",
     });
   }, [isExpanded]);
+
+  if (!isOpen) return null;
 
   return (
     <motion.div

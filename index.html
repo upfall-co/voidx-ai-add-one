@@ -6,8 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SDK 테스트 페이지</title>
   </head>
-  <body>
-    <h1>여기가 고객사 사이트</h1>
+  <body style="background: #f1f1f1">
+    <h1>TEST SITE</h1>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <button style="width: 100px">클릭 이벤트</button>
+      <img
+        src="https://images.unsplash.com/photo-1762119594508-b9be29cd513d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2223"
+        style="width: 20vw"
+      />
+    </div>
+
     <div id="voidx-ai-addon-root"></div>
     <script type="module">
       import { init } from "/src/main.tsx";

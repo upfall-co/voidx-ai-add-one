@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 
 import appStyles from "./assets/styles/index.css?inline";
+
 const defaultTargetId = "voidx-ai-addon-root";
 
 export const init = ({ apiKey }: { apiKey: string }) => {
