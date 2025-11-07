@@ -41,6 +41,7 @@ export default function SmartNudgePopup() {
   const inputValue = useSmartPopupStore((s) => s.inputValue);
   const isPin = useSmartPopupStore((s) => s.isPin);
 
+  const setIsOpen = useSmartPopupStore((s) => s.setIsOpen);
   const setIsExpanded = useSmartPopupStore((s) => s.setIsExpanded);
   const setInputValue = useSmartPopupStore((s) => s.setInputValue);
   const setOpacity = useSmartPopupStore((s) => s.setOpacity);
@@ -89,6 +90,7 @@ export default function SmartNudgePopup() {
   }, [initialX, initialY, estimatedWidth, estimatedHeight]);
 
   const handleClose = () => {
+    setIsOpen(false);
     setIsFocus(false);
     setIsHovering(false);
     setIsPin(false);
