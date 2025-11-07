@@ -1,4 +1,5 @@
 import { useAgentStore } from "@/stores/agentStore";
+import { useChatbotStore } from "@/stores/chatbotStore";
 import { useMessageStore } from "@/stores/messageStore"; // 1. messageStore 임포트
 import { useSmartPopupStore } from "@/stores/smartPopupStore";
 import { motion, useDragControls } from "framer-motion";
@@ -46,6 +47,8 @@ export default function SmartNudgePopup() {
   const setInputValue = useSmartPopupStore((s) => s.setInputValue);
   const setOpacity = useSmartPopupStore((s) => s.setOpacity);
   const setIsPin = useSmartPopupStore((s) => s.setIsPin);
+
+  const isChatbotOpen = useChatbotStore((s) => s.isOpen);
 
   const [isFocus, setIsFocus] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -143,7 +146,7 @@ export default function SmartNudgePopup() {
     });
   }, [isExpanded, nudgeList]); // 6. nudgeList 변경 시 스크롤
 
-  if (!isOpen) return null;
+  if (!isOpen || isChatbotOpen) return null;
 
   return (
     <motion.div
