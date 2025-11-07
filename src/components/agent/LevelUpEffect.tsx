@@ -2,11 +2,9 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
-/** 공통: 부드러운 이징 */
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
-/** 링(Shockwave)용 간단 셰이더: 중앙에서 바깥으로 퍼지는 링 + 퍼지 테두리 */
 function makeRingMaterial(color = new THREE.Color("#8ec5ff")) {
   const mat = new THREE.ShaderMaterial({
     transparent: true,

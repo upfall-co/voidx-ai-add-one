@@ -3,66 +3,79 @@
 const dracoUrl = `${cdnUrl}/3d/level-react-draco.glb`;
 
 import { cdnUrl } from "@/constant/common";
-import { useVoidxAgentStore } from "@/stores/voidxAgentStore";
+import { useChatbotStore } from "@/stores/chatbotStore";
 import { a, useSpring } from "@react-spring/three";
 import {
   MeshWobbleMaterial,
-  PresentationControls,
+  OrbitControls,
   useCursor,
   useGLTF,
   useMatcapTexture,
 } from "@react-three/drei";
 import { Canvas, useThree } from "@react-three/fiber";
+import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, useEffect, useState } from "react";
 import * as THREE from "three";
-import AgentModel from "./AgentModel";
 
-export default function TestRoom() {
-  const isSleeping = useVoidxAgentStore((s) => s.isSleeping);
-  const setIsSleeping = useVoidxAgentStore((s) => s.setIsSleeping);
-  const agentUrl = useVoidxAgentStore((s) => s.agentUrl);
-  console.log("[voidx] dracoUrl =", dracoUrl);
+useGLTF.preload(dracoUrl);
 
-  const [selectedObject, setSelectedObject] = useState<string | null>(null);
+export default function View360() {
+  const chatListVariants = {
+    hidden: { y: "100%", opacity: 0 },
+    visible: { y: "0%", opacity: 1 },
+    exit: { y: "100%", opacity: 0 },
+  };
 
-  useEffect(() => {
-    setIsSleeping(false);
-  }, [setIsSleeping]);
+  const mode = useChatbotStore((s) => s.mode);
+
+  if (mode !== "360") return null;
 
   return (
-    <Suspense fallback={null}>
-      <Canvas
-        dpr={[1, 2]}
-        camera={{ fov: 15, position: [0, 0, 10] }}
-        style={{ touchAction: "none" }}
+    <AnimatePresence>
+      <motion.div
+        key="chatting-list"
+        variants={chatListVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="absolute inset-0 z-10 w-full h-full"
       >
-        <ambientLight intensity={2} />
-        <directionalLight position={[10, 8, 5]} />
-        <PresentationControls
-          global
-          zoom={0.8}
-          rotation={[0, -Math.PI / 4, 0]}
-          polar={[0, Math.PI / 4]}
-          azimuth={[-Math.PI / 4, Math.PI / 4]}
-          cursor={false}
-        >
-          <group position-y={-1} dispose={null}>
-            {isSleeping && <AgentModel url={agentUrl} />}
-            <Camera />
-            <Level />
-            <Cactus onSelect={setSelectedObject} />
-            <Icon onSelect={setSelectedObject} />
-            <Sudo onSelect={setSelectedObject} />
-            <Pyramid onSelect={setSelectedObject} />
-          </group>
-        </PresentationControls>
-        <RendererCleanup />
-      </Canvas>
-    </Suspense>
+        <div className="relative w-full h-full touch-none flex items-center justify-center">
+          <h1 className="absolute z-1 text-white font-black text-4xl shadow-inner">
+            360 View
+          </h1>
+          <Suspense fallback={null}>
+            <Canvas
+              dpr={[1, 2]}
+              camera={{ fov: 20, position: [0, 0, 10] }}
+              style={{ touchAction: "none" }}
+            >
+              <ambientLight intensity={2} />
+              <directionalLight position={[10, 8, 5]} />
+              <group
+                rotation={[0, -Math.PI / 4, 0]}
+                position={[0, -1, 0]}
+                dispose={null}
+              >
+                <Camera />
+                <Level />
+                <Cactus />
+                <Icon />
+                <Sudo />
+                <Pyramid />
+              </group>
+              <RendererCleanup />
+              <OrbitControls />
+            </Canvas>
+          </Suspense>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
-function Sudo({ onSelect }: { onSelect: (name: string) => void }) {
+function Sudo() {
   const { nodes } = useGLTF(dracoUrl);
 
   const [hovered, setHovered] = useState(false);
@@ -111,7 +124,6 @@ function Sudo({ onSelect }: { onSelect: (name: string) => void }) {
       }}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect("Sudo");
       }}
     >
       <mesh
@@ -130,7 +142,7 @@ function Sudo({ onSelect }: { onSelect: (name: string) => void }) {
   );
 }
 
-function Cactus({ onSelect }: { onSelect: (name: string) => void }) {
+function Cactus() {
   const { nodes, materials } = useGLTF(dracoUrl);
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
@@ -153,7 +165,6 @@ function Cactus({ onSelect }: { onSelect: (name: string) => void }) {
       onPointerOut={() => setHovered(false)}
       onClick={(e) => {
         e.stopPropagation();
-        onSelect("Cactus");
       }}
     >
       <MeshWobbleMaterial
@@ -197,7 +208,7 @@ function Camera() {
   );
 }
 
-function Icon({ onSelect }: { onSelect: (name: string) => void }) {
+function Icon() {
   const { nodes } = useGLTF(dracoUrl);
   const [matcap] = useMatcapTexture("65A0C7_C3E4F8_A7D5EF_97CAE9", 1024);
 
@@ -229,26 +240,13 @@ function Icon({ onSelect }: { onSelect: (name: string) => void }) {
     <a.mesh
       geometry={(nodes.React as THREE.Mesh).geometry}
       {...(springs as any)}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        setHovered(true);
-        api.start({ scale: 1.2 });
-      }}
-      onPointerOut={() => {
-        setHovered(false);
-        api.start({ scale: 1 });
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect("React Icon");
-      }}
     >
       <meshMatcapMaterial matcap={matcap} />
     </a.mesh>
   );
 }
 
-function Pyramid({ onSelect }: { onSelect: (name: string) => void }) {
+function Pyramid() {
   const { nodes } = useGLTF(dracoUrl);
   const [matcap] = useMatcapTexture("489B7A_A0E7D9_6DC5AC_87DAC7", 1024);
 
@@ -283,19 +281,6 @@ function Pyramid({ onSelect }: { onSelect: (name: string) => void }) {
       geometry={(nodes.Pyramid as THREE.Mesh).geometry}
       position={[-0.8, 1.33, 0.25]}
       {...(spring as any)}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        setHovered(true);
-        api.start({ scale: 1.2 });
-      }}
-      onPointerOut={() => {
-        setHovered(false);
-        api.start({ scale: 1 });
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect("Pyramid");
-      }}
     >
       <meshMatcapMaterial matcap={matcap} />
     </a.mesh>

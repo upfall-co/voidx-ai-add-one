@@ -1,69 +1,33 @@
-"use client";
-
-import useMouse from "@/hooks/useMouse";
-import { useVoidxAgentStore } from "@/stores/voidxAgentStore";
-import { useEffect, useMemo, useState } from "react";
-import Chatbot from "./Chatbot";
-import CursorAgent from "./CursorAgent";
-import NudgePopup from "./NudgePopup";
+import { cdnUrl } from "@/constant/common";
+import { useAgentStore } from "@/stores/agentStore";
+import { useChatbotStore } from "@/stores/chatbotStore";
+import { useMessageStore } from "@/stores/messageStore";
+import { useEffect } from "react";
+import CursorAgent from "./agent/CursorAgent";
+import DonutGauge from "./agent/DonutGauge";
+import Chatbot from "./chatbot/Chatbot";
+import SmartNudgePopup from "./popup/SmartNudgePopup";
 
 export default function VoidxProvider() {
-  const { current } = useMouse();
-
-  const messages = useVoidxAgentStore((s) => s.messages);
-  const isSleeping = useVoidxAgentStore((s) => s.isSleeping);
-  const chatOpen = useVoidxAgentStore((s) => s.chatOpen);
-  const donutProgress = useVoidxAgentStore((s) => s.donutProgress);
-  const addMessage = useVoidxAgentStore((s) => s.addMessage);
-
-  const setChatOpen = useVoidxAgentStore((s) => s.setChatOpen);
+  const addMessage = useMessageStore((s) => s.addMessage);
+  const setChatOpen = useChatbotStore((s) => s.setIsOpen);
+  const setGlb = useAgentStore((s) => s.setGlb);
 
   useEffect(() => {
     setChatOpen(true);
     addMessage({ role: "user", content: "Hello!", type: "nudge" });
   }, []);
 
-  const [nudgePosition, setNudgePosition] = useState<{
-    x: number;
-    y: number;
-  } | null>({
-    x: current.x,
-    y: current.y,
-  });
-
-  const nudgeList = useMemo(
-    () => messages.filter((msg) => msg.type === "nudge"),
-    [messages]
-  );
-  // const isDonut = useMemo(
-  //   () => donutProgress > 0 && donutProgress < 100,
-  //   [donutProgress]
-  // );
-
   useEffect(() => {
-    if (nudgeList.length === 1) {
-      setNudgePosition({ x: current.x, y: current.y });
-    }
-  }, [nudgeList.length]);
+    setGlb(`${cdnUrl}/3d/Virtualis-walking.glb`);
+  }, [setGlb]);
 
   return (
     <>
-      {/* 
-      {!chatOpen && nudgeList.length > 0 && nudgePosition && (
-        <NudgePopup
-          initialX={nudgePosition.x}
-          initialY={nudgePosition.y}
-          nudgeList={nudgeList}
-        />
-      )} */}
-      <NudgePopup
-        initialX={nudgePosition.x}
-        initialY={nudgePosition.y}
-        nudgeList={nudgeList}
-      />
+      <SmartNudgePopup />
       <Chatbot />
-      {!isSleeping && <CursorAgent />}
-      {/* <DonutGauge isVisible={isDonut} progress={donutProgress} /> */}
+      <CursorAgent />
+      <DonutGauge />
     </>
   );
 }
