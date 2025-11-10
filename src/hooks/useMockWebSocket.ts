@@ -124,15 +124,14 @@ export function useMockWebSocket() {
 
     setHoverTime(progress);
 
-    // 임계치 도달 시 nudge (쿨다운 확인)
     if (progress >= 100) {
+      console.log(el);
       const lastForEl = elementCooldownRef.current.get(el) || 0;
       const nowMs = Date.now();
       const gapOk = nowMs - lastNudgedAtRef.current >= GLOBAL_MIN_GAP_MS;
       const cdOk = nowMs - lastForEl >= COOLDOWN_PER_ELEMENT_MS;
 
       if (gapOk && cdOk) {
-        // 팝업을 커서 근처로 (hit 좌표 있으면 사용)
         const x = Math.max(
           8,
           Math.min(
@@ -149,7 +148,6 @@ export function useMockWebSocket() {
         );
         setPosition({ x, y });
         setPopupIsOpen(true);
-        console.log(hit.element?.tagName || hit.tagName);
         const tag = (hit.element?.tagName || hit.tagName).toUpperCase();
         const content =
           tag === "IMG"
