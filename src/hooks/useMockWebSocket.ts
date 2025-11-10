@@ -8,7 +8,7 @@ const NUDGE_TRIGGER_DELAY = 5000;
 
 export function useMockWebSocket() {
   const { messages, addMessage } = useMessageStore();
-  const { setIsOpen, setPosition } = useSmartPopupStore();
+  const { setIsOpen: setPopupIsOpen, setPosition } = useSmartPopupStore();
 
   const lastProcessedId = useRef<string | null>(null);
 
@@ -53,15 +53,12 @@ export function useMockWebSocket() {
       return () => clearTimeout(timer);
     }
   }, [messages, addMessage]);
-  
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      const { isOpen, mode, setMode } = useChatbotStore.getState();
+      const { isOpen: isChatOpen } = useChatbotStore.getState();
 
-      if (isOpen) {
-        console.log(
-          "[MockWebSocket] 챗봇이 열려있어 챗봇으로 넛지를 보냅니다."
-        );
+      if (isChatOpen) {
         addMessage({
           role: "bot",
           content: `(시뮬레이션) 🤖
@@ -69,22 +66,13 @@ export function useMockWebSocket() {
 궁금한 점을 물어보세요!`,
           type: "chat",
         });
-
-        if (mode === "sleeping") {
-          setMode("chatting");
-        }
       } else {
-        // --- 여기부터 수정 ---
-        console.log(
-          "[MockWebSocket] 챗봇이 닫혀있어 넛지 팝업을 트리거합니다."
-        );
         setPosition({
-          x: window.innerWidth / 2 - 200, // 팝업 너비 400의 절반
-          y: window.innerHeight / 2 - 100, // 팝업 높이 200의 절반
+          x: window.innerWidth / 2 - 200,
+          y: window.innerHeight / 2 - 100,
         });
 
-        // [수정] 이 줄이 누락되었습니다.
-        setIsOpen(true);
+        setPopupIsOpen(true);
 
         addMessage({
           role: "bot",
@@ -93,11 +81,9 @@ export function useMockWebSocket() {
 궁금한 점을 물어보세요!`,
           type: "nudge",
         });
-        // --- 여기까지 수정 ---
       }
     }, NUDGE_TRIGGER_DELAY);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addMessage, setIsOpen, setPosition]); // 마운트 시 1회만 실행
+  }, [addMessage, setPopupIsOpen, setPosition]); // 마운트 시 1회만 실행
 }

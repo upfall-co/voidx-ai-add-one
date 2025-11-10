@@ -1,18 +1,68 @@
 "use client";
 
 import { cdnUrl } from "@/constant/common";
-import { useGLTF } from "@react-three/drei";
+import { useAgentStore } from "@/stores/agentStore";
+import { ContactShadows, useGLTF } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
+import { SkeletonUtils } from "three-stdlib";
+import SleepingAgentModel from "./SleepingAgent";
 
 const arkUrl = `${cdnUrl}/3d/ark_model_00.glb`;
+useGLTF.preload(arkUrl); // 프리로드
 
 export function ArkModelScene() {
   const { scene } = useGLTF(arkUrl);
+  const asleep = useAgentStore((s) => s.asleep);
+  const glb = useAgentStore((s) => s.glb);
+
+  const cloned = useMemo(() => SkeletonUtils.clone(scene), [scene]);
+
+  const { gl, size, camera, invalidate } = useThree();
+
+  useEffect(() => {
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [gl, size, camera, invalidate]);
+
+  useEffect(() => {
+    cloned.visible = true;
+    cloned.traverse((o: any) => {
+      if (o.material) {
+        if (o.material.opacity === 0) o.material.opacity = 1;
+        if (o.material.transparent && o.material.opacity < 0.01) {
+          o.material.opacity = 1;
+          o.material.needsUpdate = true;
+        }
+      }
+      if (o.visible === false) o.visible = true;
+      if (o.frustumCulled) o.frustumCulled = false;
+    });
+  }, [cloned]);
 
   return (
-    <primitive
-      object={scene}
-      position={[0, -0.4, 0]}
-      rotation={[0, Math.PI / 25, 0]}
-    />
+    <>
+      <ContactShadows
+        position={[0, -0.2, 0]}
+        opacity={0.7}
+        scale={2.5}
+        blur={8}
+        far={2}
+      />
+      <ambientLight intensity={1} />
+      <directionalLight position={[10, 10, 5]} intensity={2.0} />
+      <directionalLight position={[-10, 10, -5]} intensity={0.2} />
+
+      {asleep && glb && <SleepingAgentModel url={glb} />}
+
+      <primitive
+        key={`ark-${asleep ? "sleep" : "awake"}`}
+        object={cloned}
+        position={[0, -0.4, 0]}
+        rotation={[0, Math.PI / 25, 0]}
+        dispose={null}
+        frustumCulled={false}
+      />
+    </>
   );
 }

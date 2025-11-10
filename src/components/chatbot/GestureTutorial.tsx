@@ -64,7 +64,7 @@ export default function GestureTutorial({
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="absolute z-1 w-full h-[80%] mt-4 bg-[#2c2c2c]/70 rounded-2xl flex flex-col items-center justify-center text-white"
+          className="absolute z-1 w-full mt-4 top-0 h-[90%] bg-[#2c2c2c]/70 rounded-2xl flex flex-col items-center justify-center text-white"
         >
           {step === 0 && (
             <div className="text-center flex flex-col items-center justify-center w-full h-full gap-4">
@@ -79,7 +79,7 @@ export default function GestureTutorial({
                 </motion.div>
                 <div className="absolute top-1/3 transform -translate-y-1/2 h-1 left-0 right-0 bg-[#d9d9d9]" />
               </div>
-              <p className="text-lg mb-2">오른쪽으로 스와이프하세요</p>
+              <p className="text-lg mb-2">슬라이드 하여 채팅으로 전환</p>
             </div>
           )}
           {step === 2 && (
@@ -95,7 +95,7 @@ export default function GestureTutorial({
                 </motion.div>
                 <div className="absolute right-0 w-1 top-0 bottom-0 bg-[#d9d9d9]" />
               </div>
-              <p className="text-lg mb-2">위로 스와이프하세요</p>
+              <p className="text-lg mb-2">슬라이드 하여 360VIEW으로 전환</p>
             </div>
           )}
         </motion.div>

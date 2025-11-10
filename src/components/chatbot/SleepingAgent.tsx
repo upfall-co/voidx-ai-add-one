@@ -1,27 +1,24 @@
-import { useRef } from "react";
-import type { Group } from "three";
+// SleepingAgentModel.tsx
+import { useStableWander } from "@/hooks/useStableWander";
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
 import { GhostScene } from "../agent/CursorAgentModel";
 
-export type AgentHandle = {
-  jumpTwice: () => Promise<void>;
-};
-
-export type SleepingAgentModelProps = {
-  url: string;
-};
-
 const SleepingAgentModel = ({ url }: { url: string }) => {
-  const agentRef = useRef<Group>(null!);
+  const moverRef = useRef<THREE.Group>(null!);
+
+  useStableWander(moverRef, { seed: 1337 });
+
+  useEffect(() => {
+    const g = moverRef.current;
+    g.traverse((o) => (o.matrixAutoUpdate = true));
+  }, []);
 
   return (
-    <group
-      ref={agentRef}
-      position={[0, 0, 0.4]}
-      rotation={[-0.4, 0.8, 0.3]}
-      scale={0.2}
-      castShadow={true}
-    >
-      <GhostScene url={url} />
+    <group position={[0, -0.2, 0.4]} rotation={[-0.4, 0.8, 0.3]} scale={0.2}>
+      <group ref={moverRef}>
+        <GhostScene url={url} />
+      </group>
     </group>
   );
 };

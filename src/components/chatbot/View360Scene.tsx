@@ -32,7 +32,6 @@ export function View360Scene() {
         <Sudo />
         <Pyramid />
       </group>
-      {/* 6. RendererCleanup 컴포넌트 호출 제거 */}
       <OrbitControls />
     </>
   );
