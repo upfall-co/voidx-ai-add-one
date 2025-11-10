@@ -3,7 +3,7 @@ import { useMessageStore } from "@/stores/messageStore";
 import { useInteractionStore } from "@/stores/scenarioStore";
 import { useSmartPopupStore } from "@/stores/smartPopupStore";
 import { useEffect, useRef } from "react";
-import { useSementicTagUnderCursor } from "./useSementicTagUnderCursor";
+import { useGetElement } from "./useGetElement";
 
 const CHAT_RESPONSE_DELAY = 1000;
 const NUDGE_TRIGGER_DELAY = 5000;
@@ -11,7 +11,7 @@ const NUDGE_TRIGGER_DELAY = 5000;
 export function useMockWebSocket() {
   const { messages, addMessage } = useMessageStore();
   const { setIsOpen: setPopupIsOpen, setPosition } = useSmartPopupStore();
-  const hit = useSementicTagUnderCursor();
+  const hit = useGetElement();
 
   const lastProcessedId = useRef<string | null>(null);
 

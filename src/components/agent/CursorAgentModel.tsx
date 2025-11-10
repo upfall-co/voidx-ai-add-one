@@ -12,7 +12,6 @@ type CursorAgentModelProps = {
 
 export default function CursorAgentModel({
   url,
-  asleep,
 }: CursorAgentModelProps) {
   const [isChange, setIsChange] = useState(false);
   const agentRef = useRef<THREE.Group>(null!);
@@ -39,7 +38,6 @@ export default function CursorAgentModel({
       position={[0, 0, 0]}
       rotation={[0, 0, 0]}
       scale={0.6}
-      visible={!asleep} //
     >
       {isChange && <LevelUpEffect />}
       <GhostScene url={url} />
@@ -47,7 +45,6 @@ export default function CursorAgentModel({
   );
 }
 
-// ... (GhostScene 코드는 변경 없음)
 export function GhostScene({ url }: { url: string }) {
   const level = useInteractionStore((s) => s.level);
   const groupRef = useRef<THREE.Group>(null!);
