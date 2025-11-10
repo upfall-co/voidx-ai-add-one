@@ -2,13 +2,11 @@ import { create } from "zustand";
 
 type InteractionState = {
   level: number;
-  isHover: boolean;
   hoverTime: number;
 };
 
 type InteractionActions = {
   setLevel: (level: number | ((prevLevel: number) => number)) => void;
-  setHover: (isHover: boolean) => void;
   setHoverTime: (
     hoverTime: number | ((prevHoverTime: number) => number)
   ) => void;
@@ -19,7 +17,6 @@ export const useInteractionStore = create<
 >((set, get) => ({
   level: 1,
   hoverTime: 0,
-  isHover: false,
 
   setLevel: (newLevel) =>
     set((state) => {
@@ -43,7 +40,6 @@ export const useInteractionStore = create<
 
       return { level: Math.min(finalLevel, maxLevel) };
     }),
-  setHover: (isHover) => set({ isHover }),
   setHoverTime: (hoverTime) => {
     const newHoverTime =
       typeof hoverTime === "function" ? hoverTime(get().hoverTime) : hoverTime;

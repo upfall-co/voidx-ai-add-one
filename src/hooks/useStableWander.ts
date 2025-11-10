@@ -130,11 +130,9 @@ export function useStableWander(
       vel.current.lengthSq() > 1e-6
         ? vel.current.clone().normalize()
         : vForward;
-    // dir을 바라보는 로컬 회전 만들기
-    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(0, 0, 0), dir, vUp);
-    qDesired.setFromRotationMatrix(m);
-    g.quaternion.slerp(qDesired, Math.min(1, turnRate * dt));
 
+    const target = new THREE.Vector3().copy(g.position).add(dir);
+    g.lookAt(target);
     // (9) 액션 전환 콜백
     if (onSpeedChange) {
       const s = vel.current.length();

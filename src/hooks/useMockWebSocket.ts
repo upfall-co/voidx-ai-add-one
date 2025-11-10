@@ -1,7 +1,9 @@
 import { useChatbotStore } from "@/stores/chatbotStore";
 import { useMessageStore } from "@/stores/messageStore";
+import { useInteractionStore } from "@/stores/scenarioStore";
 import { useSmartPopupStore } from "@/stores/smartPopupStore";
 import { useEffect, useRef } from "react";
+import { useSementicTagUnderCursor } from "./useSementicTagUnderCursor";
 
 const CHAT_RESPONSE_DELAY = 1000;
 const NUDGE_TRIGGER_DELAY = 5000;
@@ -9,6 +11,7 @@ const NUDGE_TRIGGER_DELAY = 5000;
 export function useMockWebSocket() {
   const { messages, addMessage } = useMessageStore();
   const { setIsOpen: setPopupIsOpen, setPosition } = useSmartPopupStore();
+  const hit = useSementicTagUnderCursor();
 
   const lastProcessedId = useRef<string | null>(null);
 
@@ -85,5 +88,126 @@ export function useMockWebSocket() {
     }, NUDGE_TRIGGER_DELAY);
 
     return () => clearTimeout(timer);
-  }, [addMessage, setPopupIsOpen, setPosition]); // 마운트 시 1회만 실행
+  }, [addMessage, setPopupIsOpen, setPosition]);
+
+  const HOVER_THRESHOLD_MS = 1200;
+  const COOLDOWN_PER_ELEMENT_MS = 6000;
+  const GLOBAL_MIN_GAP_MS = 2000;
+
+  const setHoverTime = useInteractionStore((s) => s.setHoverTime);
+
+  // 현재 추적 중인 엘리먼트와 시작 시각
+  const activeElRef = useRef<Element | null>(null);
+  const startAtRef = useRef<number>(0);
+  const rafRef = useRef<number | null>(null);
+
+  // 요소별/전역 쿨다운
+  const lastNudgedAtRef = useRef<number>(0);
+  const elementCooldownRef = useRef<WeakMap<Element, number>>(new WeakMap());
+
+  // 유틸: IMG/BUTTON만 허용
+  const isTarget = (el: Element | null, tagName?: string | null) => {
+    if (!el || !tagName) return false;
+    const t = tagName.toUpperCase();
+    return t === "IMG" || t === "BUTTON";
+  };
+
+  // rAF 루프
+  const loop = () => {
+    rafRef.current = null;
+    const el = activeElRef.current;
+    if (!el) return;
+
+    const now = performance.now();
+    const elapsed = Math.max(0, now - startAtRef.current);
+    const progress = Math.min(100, (elapsed / HOVER_THRESHOLD_MS) * 100);
+
+    setHoverTime(progress);
+
+    // 임계치 도달 시 nudge (쿨다운 확인)
+    if (progress >= 100) {
+      const lastForEl = elementCooldownRef.current.get(el) || 0;
+      const nowMs = Date.now();
+      const gapOk = nowMs - lastNudgedAtRef.current >= GLOBAL_MIN_GAP_MS;
+      const cdOk = nowMs - lastForEl >= COOLDOWN_PER_ELEMENT_MS;
+
+      if (gapOk && cdOk) {
+        // 팝업을 커서 근처로 (hit 좌표 있으면 사용)
+        const x = Math.max(
+          8,
+          Math.min(
+            (hit.clientX ?? window.innerWidth / 2) + 12,
+            window.innerWidth - 400
+          )
+        );
+        const y = Math.max(
+          8,
+          Math.min(
+            (hit.clientY ?? window.innerHeight / 2) + 12,
+            window.innerHeight - 160
+          )
+        );
+        setPosition({ x, y });
+        setPopupIsOpen(true);
+        console.log(hit.element?.tagName || hit.tagName);
+        const tag = (hit.element?.tagName || hit.tagName).toUpperCase();
+        const content =
+          tag === "IMG"
+            ? `(시뮬레이션) 🖼️
+이미지 위에 마우스를 살짝 올려보세요. 확대/상세 기능이 있을 수 있어요.`
+            : tag === "BUTTON"
+            ? `(시뮬레이션) 🔘
+이 버튼을 클릭해보세요. 다음 단계로 진행할 수 있어요.`
+            : null;
+
+        addMessage({ role: "bot", content, type: "nudge" });
+        lastNudgedAtRef.current = nowMs;
+        elementCooldownRef.current.set(el, nowMs);
+      }
+
+      startAtRef.current = now;
+      setHoverTime(0);
+    }
+
+    rafRef.current = requestAnimationFrame(loop);
+  };
+
+  useEffect(() => {
+    const el = (hit.element as Element | null) ?? null;
+    const eligible = isTarget(el, hit.element?.tagName || hit.tagName);
+
+    if (eligible) {
+      if (activeElRef.current !== el) {
+        activeElRef.current = el;
+        startAtRef.current = performance.now();
+        setHoverTime(0);
+      }
+      if (rafRef.current == null) {
+        rafRef.current = requestAnimationFrame(loop);
+      }
+    } else {
+      activeElRef.current = null;
+      setHoverTime(0);
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    }
+
+    return () => {
+      if (rafRef.current != null && !activeElRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [
+    hit.element,
+    hit.tagName,
+    hit.clientX,
+    hit.clientY,
+    setHoverTime,
+    setPopupIsOpen,
+    setPosition,
+    addMessage,
+  ]);
 }

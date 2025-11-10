@@ -5,7 +5,6 @@ import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 export default function DonutGauge() {
   const pointer = useRef({ x: 0, y: 0 });
 
-  const isHover = useInteractionStore((s) => s.isHover);
   const hoverTime = useInteractionStore((s) => s.hoverTime);
 
   useEffect(() => {
@@ -18,7 +17,7 @@ export default function DonutGauge() {
     return () => window.removeEventListener("mousemove", handleMouse);
   }, []);
 
-  if (!isHover) return null;
+  if (hoverTime < 1) return null;
 
   return (
     <div
