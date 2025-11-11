@@ -42,9 +42,8 @@ pipeline {
                     //    예: 'dist/static/main.js' -> 'static/main.js' (버킷 경로)
                     dir('dist') {
                         echo "Uploading JS files to OSS bucket: ${bucketName}"
-                        
-                        // 3. aliyunOSSUpload 스텝을 사용하여 업로드합니다.
-                        aliyunOSSUpload(
+
+                        ossUpload(
                             credentialsId: env.ALIYUN_CREDS_ID, 
                             bucketName: bucketName, 
                             filesPath: '**/*.js',  // 'dist' 디렉토리 하위의 모든 .js 파일을 대상으로 함
