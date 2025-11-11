@@ -26,16 +26,6 @@ pipeline {
             }
         }
 
-        stage('Get Version') {
-            steps {
-                script {
-                    def packageJson = readJSON file: 'package.json'
-                    env.VERSION = packageJson.version
-                    echo "Deploying version: ${env.VERSION}"
-                }
-            }
-        }
-
         // // 7. Aliyun Credentials 플러그인으로 인증 정보 감싸기
         // alibabaCloudCredentials(credentialsId: ALIYUN_CREDS_ID) {
             
