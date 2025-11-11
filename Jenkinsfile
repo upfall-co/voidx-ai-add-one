@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/upfall-co/voidx-ai-add-on'
+                git branch: 'main', url: 'https://github.com/upfall-co/voidx-ai-add-on.git'
             }
         }
 
