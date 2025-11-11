@@ -17,7 +17,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 // npm ci를 사용하면 package-lock.json을 기반으로 더 빠르고 일관된 설치가 가능합니다.
-                sh 'npm ci'
+                sh 'npm install'
             }
         }
 
