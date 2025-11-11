@@ -18,28 +18,18 @@ export const useInteractionStore = create<
   level: 1,
   hoverTime: 0,
 
-  setLevel: (newLevel) =>
-    set((state) => {
-      const maxLevel = 5;
-      const potentialNewLevel =
-        typeof newLevel === "function" ? newLevel(state.level) : newLevel;
+  setLevel: (newLevel) => {
+    const updatedLevel =
+      typeof newLevel === "function" ? newLevel(get().level) : newLevel;
 
-      if (state.level >= maxLevel) {
-        return { level: maxLevel };
-      }
+    const cappedLevel = updatedLevel > 5 ? 5 : updatedLevel;
 
-      const currentLevelInt = Math.floor(state.level);
-      const newLevelInt = Math.floor(potentialNewLevel);
+    if (cappedLevel === get().level) return;
 
-      let finalLevel = state.level;
-      if (newLevelInt > currentLevelInt) {
-        finalLevel = newLevelInt;
-      } else {
-        finalLevel = potentialNewLevel;
-      }
-
-      return { level: Math.min(finalLevel, maxLevel) };
-    }),
+    set({
+      level: cappedLevel,
+    });
+  },
   setHoverTime: (hoverTime) => {
     const newHoverTime =
       typeof hoverTime === "function" ? hoverTime(get().hoverTime) : hoverTime;

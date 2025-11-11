@@ -1,16 +1,5 @@
+import type { ClientMessage } from "@/types/message";
 import { create } from "zustand";
-
-export type MessageType = "chat" | "nudge";
-export type MessageRole = "user" | "bot";
-export type ContentType = "message" | "product";
-
-export type ClientMessage = {
-  id: string;
-  role: MessageRole;
-  content: string;
-  type: MessageType;
-  contentType?: ContentType;
-};
 
 function generateUUID() {
   if (crypto && crypto.randomUUID) {
