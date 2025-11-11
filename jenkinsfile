@@ -2,13 +2,9 @@ pipeline {
     agent any 
 
     environment {
-        // 2. 환경 변수 설정
-        // Jenkins Credentials에 등록된 Aliyun Access Key ID (문자열 타입)
-        ALIYUN_CREDS_ID = 'your-aliyun-credentials-id' 
-        // 업로드할 OSS 버킷 경로 (oss:// 프로토콜 사용)
-        OSS_BUCKET = 'oss://your-cdn-bucket-name'
-        // 캐시 무효화를 위한 CDN 도메인
-        CDN_DOMAIN = 'cdn.your-domain.com'
+        ALIYUN_CREDS_ID = 'LTAI5tCrPDaDWZsjM7GNbigM' 
+        OSS_BUCKET = 'oss://voidx-ai-add-on'
+        CDN_DOMAIN = 'https://addon-cdn.voidx.ai'
     }
 
     stages {
@@ -20,13 +16,13 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'yarn install'
+                sh 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'yarn build' 
+                sh 'npm run build'
             }
         }
 
