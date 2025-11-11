@@ -1,0 +1,89 @@
+pipeline {
+    agent any 
+
+    environment {
+        // 2. 환경 변수 설정
+        // Jenkins Credentials에 등록된 Aliyun Access Key ID (문자열 타입)
+        ALIYUN_CREDS_ID = 'your-aliyun-credentials-id' 
+        // 업로드할 OSS 버킷 경로 (oss:// 프로토콜 사용)
+        OSS_BUCKET = 'oss://your-cdn-bucket-name'
+        // 캐시 무효화를 위한 CDN 도메인
+        CDN_DOMAIN = 'cdn.your-domain.com'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/upfall-co/voidx-ai-add-on'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'yarn install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'yarn build' 
+            }
+        }
+
+        stage('Get Version') {
+            steps {
+                script {
+                    def packageJson = readJSON file: 'package.json'
+                    env.VERSION = packageJson.version
+                    echo "Deploying version: ${env.VERSION}"
+                }
+            }
+        }
+
+        // 7. Aliyun Credentials 플러그인으로 인증 정보 감싸기
+        alibabaCloudCredentials(credentialsId: ALIYUN_CREDS_ID) {
+            
+            stage('Upload to Versioned Path (Immutable)') {
+                steps {
+                    // 8. 버전 경로로 업로드 (불변 캐시 설정)
+                    // aliyun oss cp [소스] [대상] --recursive --meta [헤더]
+                    sh """
+                    aliyun oss cp ./dist/ ${OSS_BUCKET}/v${env.VERSION}/ \
+                        --recursive \
+                        --meta "Cache-Control:max-age=31536000,immutable"
+                    """
+                }
+            }
+
+            stage('Upload to Latest Path (Mutable)') {
+                steps {
+                    // 9. 'latest' 경로로 업로드 (짧은 캐시 설정)
+                    sh """
+                    aliyun oss cp ./dist/ ${OSS_BUCKET}/latest/ \
+                        --recursive \
+                        --meta "Cache-Control:max-age=300,public"
+                    """
+                }
+            }
+
+            stage('Invalidate CDN Cache') {
+                steps {
+                    // 10. 'latest' 디렉토리 캐시 무효화
+                    // aliyun cdn RefreshObjectCaches --ObjectPath [도메인/경로] --ObjectType Directory
+                    sh """
+                    aliyun cdn RefreshObjectCaches \
+                        --ObjectPath "https://${CDN_DOMAIN}/latest/" \
+                        --ObjectType "Directory"
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // 빌드 완료 후 워크스페이스 정리
+            deleteDir()
+        }
+    }
+}
