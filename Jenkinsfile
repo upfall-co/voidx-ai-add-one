@@ -25,45 +25,6 @@ pipeline {
                 sh 'npm run build'
             }
         }
-
-        // // 7. Aliyun Credentials 플러그인으로 인증 정보 감싸기
-        // alibabaCloudCredentials(credentialsId: ALIYUN_CREDS_ID) {
-            
-        //     stage('Upload to Versioned Path (Immutable)') {
-        //         steps {
-        //             // 8. 버전 경로로 업로드 (불변 캐시 설정)
-        //             // aliyun oss cp [소스] [대상] --recursive --meta [헤더]
-        //             sh """
-        //             aliyun oss cp ./dist/ ${OSS_BUCKET}/v${env.VERSION}/ \
-        //                 --recursive \
-        //                 --meta "Cache-Control:max-age=31536000,immutable"
-        //             """
-        //         }
-        //     }
-
-        //     stage('Upload to Latest Path (Mutable)') {
-        //         steps {
-        //             // 9. 'latest' 경로로 업로드 (짧은 캐시 설정)
-        //             sh """
-        //             aliyun oss cp ./dist/ ${OSS_BUCKET}/latest/ \
-        //                 --recursive \
-        //                 --meta "Cache-Control:max-age=300,public"
-        //             """
-        //         }
-        //     }
-
-        //     stage('Invalidate CDN Cache') {
-        //         steps {
-        //             // 10. 'latest' 디렉토리 캐시 무효화
-        //             // aliyun cdn RefreshObjectCaches --ObjectPath [도메인/경로] --ObjectType Directory
-        //             sh """
-        //             aliyun cdn RefreshObjectCaches \
-        //                 --ObjectPath "https://${CDN_DOMAIN}/latest/" \
-        //                 --ObjectType "Directory"
-        //             """
-        //         }
-        //     }
-        // }
     }
     
     post {
