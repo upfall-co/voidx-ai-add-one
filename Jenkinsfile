@@ -42,7 +42,7 @@ pipeline {
                         echo "Uploading JS files to OSS bucket: ${bucketName}"
 
                         // (수정됨) 명령어와 파라미터 이름을 플러그인에 맞게 변경
-                        aliyunOSS(
+                        aliyunOSSUpload(
                             credentialsId: env.ALIYUN_CREDS_ID, 
                             bucket: bucketName, 
                             files: '**/*.js',  // 'dist' 디렉토리 하위의 모든 .js 파일을 대상으로 함
