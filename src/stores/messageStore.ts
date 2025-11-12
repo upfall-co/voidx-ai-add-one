@@ -17,6 +17,7 @@ type ClientMessageActions = {
   addMessage: (message: Omit<ClientMessage, "id">) => void;
   removeMessage: (index: number) => void;
   clearMessages: () => void;
+  convertNudgesToChat: () => void;
 };
 
 export const useMessageStore = create<
@@ -33,4 +34,10 @@ export const useMessageStore = create<
       messages: state.messages.filter((_, i) => i !== index),
     })),
   clearMessages: () => set({ messages: [] }),
+  convertNudgesToChat: () =>
+    set((state) => ({
+      messages: state.messages.map((msg) =>
+        msg.type === "nudge" ? { ...msg, type: "chat" } : msg
+      ),
+    })),
 }));

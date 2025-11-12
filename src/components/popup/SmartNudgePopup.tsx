@@ -35,8 +35,8 @@ export default function SmartNudgePopup() {
     [allMessages]
   );
 
-  const isOpen = useSmartPopupStore((s) => s.isOpen);
   const { x: initialX, y: initialY } = useSmartPopupStore((s) => s.position);
+  const isOpen = useSmartPopupStore((s) => s.isOpen);
   const opacity = useSmartPopupStore((s) => s.opacity);
   const isExpanded = useSmartPopupStore((s) => s.isExpanded);
   const inputValue = useSmartPopupStore((s) => s.inputValue);
@@ -47,7 +47,8 @@ export default function SmartNudgePopup() {
   const setInputValue = useSmartPopupStore((s) => s.setInputValue);
   const setOpacity = useSmartPopupStore((s) => s.setOpacity);
   const setIsPin = useSmartPopupStore((s) => s.setIsPin);
-  const setPosition = useSmartPopupStore((s) => s.setPosition);
+
+  const convertNudgesToChat = useMessageStore((s) => s.convertNudgesToChat);
 
   const isChatbotOpen = useChatbotStore((s) => s.isOpen);
 
@@ -99,6 +100,7 @@ export default function SmartNudgePopup() {
     setIsHovering(false);
     setIsPin(false);
     setIsExpanded(false);
+    convertNudgesToChat();
   };
 
   const submitMessage = () => {
@@ -141,7 +143,7 @@ export default function SmartNudgePopup() {
       }, 5000);
     }
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);
     };
   }, [nudgeList, isPin, isFocus, isHovering, handleClose]);
 
@@ -152,7 +154,11 @@ export default function SmartNudgePopup() {
     });
   }, [isExpanded, nudgeList]);
 
-  if (!isOpen || isChatbotOpen) return null;
+  useEffect(() => {
+    if (isChatbotOpen) handleClose();
+  }, [isChatbotOpen]);
+
+  if (!isOpen) return null;
 
   return (
     <motion.div
