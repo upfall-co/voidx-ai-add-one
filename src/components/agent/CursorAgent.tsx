@@ -1,5 +1,4 @@
 import { useAgentStore } from "@/stores/agentStore";
-import { Environment } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import CursorAgentModel from "./CursorAgentModel";
@@ -28,10 +27,11 @@ export default function CursorAgent() {
         bottom: 0,
       }}
     >
-      <ambientLight intensity={0.3} />
       <Suspense fallback={null}>
+        <ambientLight intensity={2} />
+        <directionalLight position={[10, 10, 5]} intensity={3} />
+        <directionalLight position={[-10, 10, -5]} intensity={0.2} />
         <CursorAgentModel url={glb} asleep={asleep} />
-        <Environment preset="warehouse" />
       </Suspense>
     </Canvas>
   );

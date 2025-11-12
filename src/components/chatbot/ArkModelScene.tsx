@@ -2,7 +2,7 @@
 
 import { cdnUrl } from "@/constant/common";
 import { useAgentStore } from "@/stores/agentStore";
-import { ContactShadows, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import { SkeletonUtils } from "three-stdlib";
@@ -42,19 +42,11 @@ export function ArkModelScene() {
 
   return (
     <>
-      <ContactShadows
-        position={[0, -0.2, 0]}
-        opacity={0.7}
-        scale={2.5}
-        blur={8}
-        far={2}
-      />
+      {asleep && glb && <SleepingAgentModel url={glb} />}
+
       <ambientLight intensity={1} />
       <directionalLight position={[10, 10, 5]} intensity={2.0} />
       <directionalLight position={[-10, 10, -5]} intensity={0.2} />
-
-      {asleep && glb && <SleepingAgentModel url={glb} />}
-
       <primitive
         key={`ark-${asleep ? "sleep" : "awake"}`}
         object={cloned}
