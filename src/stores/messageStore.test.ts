@@ -1,9 +1,4 @@
-import type {
-  ClientMessage,
-  ContentType,
-  MessageRole,
-  MessageType,
-} from "@/types/message";
+import type { ClientMessage, MessageRole, MessageType } from "@/types/message";
 import { act, renderHook } from "@testing-library/react";
 import { useMessageStore } from "./messageStore";
 
@@ -77,7 +72,6 @@ describe("useMessageStore (Zustand)", () => {
       role: "bot" as MessageRole,
       content: "Test nudge message",
       type: "nudge" as MessageType,
-      contentType: "product" as ContentType,
     };
 
     act(() => {
