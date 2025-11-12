@@ -125,7 +125,7 @@ export function useMockWebSocket() {
     setHoverTime(progress);
 
     if (progress >= 100) {
-      console.log(el);
+      // console.log(el);
       const lastForEl = elementCooldownRef.current.get(el) || 0;
       const nowMs = Date.now();
       const gapOk = nowMs - lastNudgedAtRef.current >= GLOBAL_MIN_GAP_MS;

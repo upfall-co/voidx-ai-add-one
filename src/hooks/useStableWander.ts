@@ -1,4 +1,3 @@
-// hooks/useStableWander.ts
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
@@ -36,7 +35,7 @@ export function useStableWander(
     baseSpeed = 0.7,
     speedJitter = 0.25,
     turnRate = Math.PI, // rad/s
-    circleDistance = 0.9,
+    circleDistance = 0.3,
     circleRadius = 0.5,
     jitter = 0.15,
     bounds = {
@@ -47,6 +46,8 @@ export function useStableWander(
     avoidStrength = 1.2,
     onSpeedChange,
   } = opts;
+
+  const initialQuat = useRef<THREE.Quaternion | null>(null);
 
   const rng = useRef(makePRNG(seed));
   const vel = useRef(new THREE.Vector3(1, 0, 0).multiplyScalar(baseSpeed));
@@ -115,7 +116,7 @@ export function useStableWander(
     vDesired.copy(vTarget).sub(g.position).normalize();
     const speedTarget = baseSpeed + (rng.current() * 2 - 1) * speedJitter;
     const steering = vDesired.multiplyScalar(speedTarget).sub(vel.current);
-    vel.current.addScaledVector(steering, 0.4); // steering 가중치
+    vel.current.addScaledVector(steering, 0.1); // steering 가중치
 
     const maxSpeed = baseSpeed + speedJitter;
     if (vel.current.length() > maxSpeed) vel.current.setLength(maxSpeed);
@@ -130,10 +131,13 @@ export function useStableWander(
       vel.current.lengthSq() > 1e-6
         ? vel.current.clone().normalize()
         : vForward;
+    // dir을 바라보는 로컬 회전 만들기
+    // dir.negate();
+    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(0, 0, 0), dir, vUp);
 
-    const target = new THREE.Vector3().copy(g.position).add(dir);
-    g.lookAt(target);
-    // (9) 액션 전환 콜백
+    qDesired.setFromRotationMatrix(m);
+    g.quaternion.slerp(qDesired, Math.min(1, turnRate * dt));
+
     if (onSpeedChange) {
       const s = vel.current.length();
       if (Math.abs(s - prevSpeed.current) > 0.02) {

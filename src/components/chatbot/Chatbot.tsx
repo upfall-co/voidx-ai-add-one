@@ -16,7 +16,6 @@ import { PiPaperPlaneFill } from "react-icons/pi";
 import { useSwipeable } from "react-swipeable";
 import { ArkModelScene } from "./ArkModelScene";
 import ChattingList from "./ChattingList";
-import GestureTutorial from "./GestureTutorial";
 import ChatbotToolbar from "./Toolbar";
 
 export default function Chatbot() {
@@ -182,9 +181,9 @@ export default function Chatbot() {
               </Canvas>
             </Suspense>
 
-            {tutorialStep < 1 && (
+            {/* {tutorialStep < 1 && (
               <GestureTutorial step={tutorialStep} isOpen={isOpen} />
-            )}
+            )} */}
             <ChattingList />
           </div>
 

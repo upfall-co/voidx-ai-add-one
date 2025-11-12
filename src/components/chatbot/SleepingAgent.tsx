@@ -7,7 +7,7 @@ import { GhostScene } from "../agent/CursorAgentModel";
 const SleepingAgentModel = ({ url }: { url: string }) => {
   const moverRef = useRef<THREE.Group>(null!);
 
-  useStableWander(moverRef, { seed: 1337 });
+  useStableWander(moverRef);
 
   useEffect(() => {
     const g = moverRef.current;
@@ -15,8 +15,8 @@ const SleepingAgentModel = ({ url }: { url: string }) => {
   }, []);
 
   return (
-    <group position={[0, -0.2, 0.4]} rotation={[-0.4, 0.8, 0.3]} scale={0.2}>
-      <group ref={moverRef}>
+    <group ref={moverRef}>
+      <group rotation={[0, Math.PI, 0]} scale={0.2}>
         <GhostScene url={url} />
       </group>
     </group>
