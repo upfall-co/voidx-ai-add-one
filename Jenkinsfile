@@ -31,9 +31,7 @@ pipeline {
                 script {
                     def bucketName = env.OSS_BUCKET.replace('oss://', '')
                     
-                    // 1. 현재 버전을 GIT_COMMIT의 앞 7자리로 정의합니다.
-                    def version = env.GIT_COMMIT.substring(0, 7)
-                    echo "Current Version (Git Hash): ${version}"
+                    def version = "v0.${env.BUILD_NUMBER}"
                     
                     withCredentials([usernamePassword(credentialsId: env.ALIYUN_CREDS_ID, 
                                                      usernameVariable: 'ALIYUN_KEY_ID', 
