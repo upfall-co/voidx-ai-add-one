@@ -46,7 +46,7 @@ pipeline {
                                 endpoint: "oss-ap-northeast-2.aliyuncs.com",
                                 bucketName: bucketName,
                                 
-                                localPath: ' **/*', 
+                                localPath: ' voidx-ai-addon.es.js', 
                                 
                                 remotePath: '/'          
                             )
