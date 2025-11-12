@@ -30,19 +30,28 @@ pipeline {
             steps {
                 script {
                     def bucketName = env.OSS_BUCKET.replace('oss://', '')
+                    
                     withCredentials([usernamePassword(credentialsId: env.ALIYUN_CREDS_ID, 
                                                      usernameVariable: 'ALIYUN_KEY_ID', 
                                                      passwordVariable: 'ALIYUN_KEY_SECRET')]) {
                         
                         dir('dist') {
-                            echo "Uploading JS files to OSS bucket: ${bucketName}"
+                            echo "Uploading ALL files from /dist to OSS bucket: ${bucketName}"
+
+                            // [디버깅 추가] dist 폴더의 모든 파일 목록을 로그에 출력합니다.
+                            echo "--- Files in dist directory ---"
+                            sh 'ls -R'
+                            echo "---------------------------------"
 
                             aliyunOSSUpload(
                                 accessKeyId: env.ALIYUN_KEY_ID,
                                 accessKeySecret: env.ALIYUN_KEY_SECRET,
                                 endpoint: "oss-ap-northeast-2.aliyuncs.com",
                                 bucketName: bucketName,
-                                localPath: '**/*',
+                                
+                                // [수정] localPath를 '**/*' (별표 두 개)로 변경
+                                localPath: '**/*', 
+                                
                                 remotePath: '/'          
                             )
                         }
