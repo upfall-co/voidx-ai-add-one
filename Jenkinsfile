@@ -35,18 +35,18 @@ pipeline {
                                                      usernameVariable: 'ALIYUN_KEY_ID', 
                                                      passwordVariable: 'ALIYUN_KEY_SECRET')]) {
                         
-                        dir('dist') { // 2. dist 디렉토리 내부에서 실행
+                        dir('dist') {
                             echo "Uploading JS files to OSS bucket: ${bucketName}"
 
                             aliyunOSSUpload(
                                 accessKeyId: env.ALIYUN_KEY_ID,
                                 accessKeySecret: env.ALIYUN_KEY_SECRET,
                                 
-                                endpoint: "oss-ap-northeast-2.aliyuncs.com"
+                                endpoint: "oss-ap-northeast-2.aliyuncs.com", 
                                 
-                                bucketName: voidx-ai-add-on,   
+                                bucketName: bucketName, 
                                 
-                                localPath: '**/*.js',   
+                                localPath: '**/*.js',
                                 
                                 remotePath: '/'          
                             )
