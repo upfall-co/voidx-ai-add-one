@@ -1,8 +1,8 @@
 "use client";
 
 import { useChatbotStore } from "@/stores/chatbotStore";
+import { useInteractionStore } from "@/stores/interactionStore";
 import { useMessageStore } from "@/stores/messageStore";
-import { useInteractionStore } from "@/stores/scenarioStore";
 import { Canvas } from "@react-three/fiber"; // 2. 임포트
 import {
   type KeyboardEvent,

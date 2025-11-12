@@ -2,7 +2,7 @@
 
 import { useAgentStore } from "@/stores/agentStore";
 import { useChatbotStore } from "@/stores/chatbotStore";
-import { useInteractionStore } from "@/stores/scenarioStore";
+import { useInteractionStore } from "@/stores/interactionStore";
 import { BiSolidSun } from "react-icons/bi";
 import { FaChevronDown, FaMoon } from "react-icons/fa";
 

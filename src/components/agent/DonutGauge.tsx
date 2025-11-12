@@ -1,4 +1,4 @@
-import { useInteractionStore } from "@/stores/scenarioStore";
+import { useInteractionStore } from "@/stores/interactionStore";
 import { useEffect, useRef } from "react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 
