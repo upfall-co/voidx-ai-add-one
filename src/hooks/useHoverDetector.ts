@@ -1,6 +1,7 @@
 import { useInteractionStore } from "@/stores/interactionStore";
-import { findSemanticAncestor, getRole } from "@/utils/semanticUtils"; // (2) 유틸 경로
-import { useEffect, useRef } from "react";
+import { useSmartPopupStore } from "@/stores/smartPopupStore";
+import { findSemanticAncestor, getRole } from "@/utils/semanticUtils";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * 1. 훅이 감지할 타겟 요소의 조건 (JSON 형태)
@@ -13,7 +14,7 @@ export interface HoverTargets {
 }
 
 /**
- * 헬퍼 함수: 요소가 타겟 조건에 맞는지 검사
+ * 헬퍼: 요소가 지정된 타겟 조건과 일치하는지 확인합니다.
  */
 function isTarget(element: Element | null, targets: HoverTargets): boolean {
   if (!element) return false;
@@ -39,33 +40,41 @@ function isTarget(element: Element | null, targets: HoverTargets): boolean {
 }
 
 /**
- * 지정된 타겟 요소 위에서 N초간 호버하면 감지하고 콘솔에 출력하는 훅
- * @param targets - 감지할 요소의 조건 (ID, 클래스, 태그, 역할)
+ * 지정된 타겟 요소 위에 일정 시간 호버하면 감지하고,
+ * 해당 요소와 위치를 스토어에 저장하는 훅.
+ *
+ * @param targets - 감지할 요소의 조건
  * @param hoverDurationMs - 호버 완료까지 필요한 시간 (ms)
+ * @returns 감지 완료된 요소 (Element | null)
  */
 export function useHoverDetector(
   targets: HoverTargets,
   hoverDurationMs: number = 2000
 ) {
-  // 3. Zustand 스토어에서 setHoverTime 액션 가져오기
+  // 감지 완료된 요소를 반환
+  const [detectedElement, setDetectedElement] = useState<Element | null>(null);
+
+  // --- 스토어 액션 ---
   const setHoverTime = useInteractionStore((state) => state.setHoverTime);
+  const setPosition = useSmartPopupStore((s) => s.setPosition);
 
   // --- 내부 상태 관리를 위한 Refs ---
-  const pointRef = useRef<{ x: number; y: number } | null>(null); // 현재 마우스 위치
-  const rafRef = useRef<number | null>(null); // 메인 rAF (tick)
-  const lastElementRef = useRef<Element | null>(null); // 중복 감지 방지용 (마지막 프레임)
+  const pointRef = useRef<{ x: number; y: number } | null>(null); // 현재 마우스 커서 좌표
+  const rafRef = useRef<number | null>(null); // 메인 루프(tick) rAF ID
+  const lastElementRef = useRef<Element | null>(null); // 마지막 프레임에서 감지한 요소 (중복 방지)
 
   // --- 타이머 및 잠금(Lock) 상태 Refs ---
-  const currentTargetRef = useRef<Element | null>(null); // 현재 호버 중인 *타겟*
-  const lockedElementRef = useRef<Element | null>(null); // 5. 100% 완료되어 잠긴 요소
-  const timerRafRef = useRef<number | null>(null); // 3. 프로그레스 타이머 rAF
-  const hoverStartRef = useRef<number | null>(null); // 호버 시작 시간 (Date.now())
+  const currentTargetRef = useRef<Element | null>(null); // 현재 호버 타이머가 실행 중인 대상
+  const lockedElementRef = useRef<Element | null>(null); // 감지가 완료되어 "잠긴" 대상
+  const timerRafRef = useRef<number | null>(null); // 호버 진행률(progress) 타이머 rAF ID
+  const hoverStartRef = useRef<number | null>(null); // 호버 시작 타임스탬프
 
   useEffect(() => {
     const controller = new AbortController();
     const { signal } = controller;
 
-    // --- 3, 4. 프로그레스 타이머 로직 ---
+    // --- 1. 호버 진행률 타이머 로직 ---
+
     const cancelProgressTimer = () => {
       if (timerRafRef.current) {
         cancelAnimationFrame(timerRafRef.current);
@@ -74,14 +83,20 @@ export function useHoverDetector(
       hoverStartRef.current = null;
     };
 
-    /** 5, 6. 호버 100% 완료 시 실행되는 함수 */
+    /** 호버 100% 완료 시 실행되는 콜백 */
     const onTargetComplete = (element: Element) => {
-      lockedElementRef.current = element; // 5. 엘리먼트 저장 (잠금)
-      console.log("✅ Hover Locked:", element); // 6. 콘솔 출력
-      setHoverTime(0); // 7. hoverTime 초기화
+      lockedElementRef.current = element; // 1. 요소를 "잠금" 처리
+      setDetectedElement(element); // 2. 감지된 요소 상태 업데이트
+      setHoverTime(0); // 3. 스토어의 진행률 초기화
+
+      // 4. 스토어에 팝업 위치(현재 커서) 전송
+      const pos = pointRef.current;
+      if (pos) {
+        setPosition(pos);
+      }
     };
 
-    /** 3. 프로그레스 타이머 실행 (rAF 루프) */
+    /** 호버 진행률 타이머 (rAF 루프) */
     const runProgressTimer = () => {
       const startTime = hoverStartRef.current;
       // 타이머가 시작되지 않았거나, 대상 엘리먼트가 사라졌으면 중단
@@ -91,101 +106,95 @@ export function useHoverDetector(
       }
 
       const elapsed = Date.now() - startTime;
-      let progress = (elapsed / hoverDurationMs) * 100;
+      const progress = Math.min((elapsed / hoverDurationMs) * 100, 100);
+
+      setHoverTime(progress); // 스토어에 진행률 업데이트
 
       if (progress >= 100) {
-        setHoverTime(100);
         onTargetComplete(currentTargetRef.current); // 100% 달성!
         cancelProgressTimer();
       } else {
-        setHoverTime(progress); // 0~100 사이 값으로 스토어 업데이트
-        timerRafRef.current = requestAnimationFrame(runProgressTimer); // 다음 프레임 요청
+        timerRafRef.current = requestAnimationFrame(runProgressTimer);
       }
     };
 
-    /** 2. 타겟 요소 진입 시 (Enter) */
+    // --- 2. 타겟 진입/이탈 이벤트 핸들러 ---
+
+    /** 타겟 요소 진입 시: 타이머 시작 */
     const onTargetEnter = (element: Element) => {
       cancelProgressTimer(); // 기존 타이머 취소
-      hoverStartRef.current = Date.now(); // 3. 타이머 시작 시간 기록
+      hoverStartRef.current = Date.now();
       setHoverTime(0);
-      timerRafRef.current = requestAnimationFrame(runProgressTimer); // 타이머 루프 시작
+      timerRafRef.current = requestAnimationFrame(runProgressTimer);
     };
 
-    /** 4. 타겟 요소 이탈 시 (Leave) */
+    /** 타겟 요소 이탈 시: 타이머 취소 및 초기화 */
     const onTargetLeave = () => {
       cancelProgressTimer();
-      setHoverTime(0); // 4. hoverTime 초기화
+      setHoverTime(0);
     };
 
-    // --- 2. 마우스 추적 및 요소 감지 로직 (메인 루프) ---
+    // --- 3. 메인 감지 루프 (rAF) ---
+
+    /** 매 프레임 실행되는 메인 감지 로직 */
     const tick = () => {
       rafRef.current = null;
       const pt = pointRef.current;
       if (!pt) return;
 
-      // 커서 위치의 요소 찾기 (Shadow DOM 포함)
+      // 1. 커서 위치에서 시맨틱 요소 찾기 (Shadow DOM 포함)
       let el: Element | null = document.elementFromPoint(pt.x, pt.y) || null;
       const anyEvt = window.event as any;
       const path = anyEvt?.composedPath?.() as EventTarget[] | undefined;
       if (path && path.length && path[0] instanceof Element) {
         el = path[0] as Element;
       }
-
-      // 가장 가까운 시맨틱 부모 찾기
       const semEl = findSemanticAncestor(el);
 
-      // --- 메인 감지/잠금 로직 ---
-
-      // 5. 요소가 잠겨있는지 확인
-      if (lockedElementRef.current) {
-        if (semEl !== lockedElementRef.current) {
-          // 마우스가 잠긴 요소에서 벗어남 -> 잠금 해제
-          lockedElementRef.current = null;
-        } else {
-          // 아직 잠긴 요소 위에 있음 -> 모든 프로세스 중단
-          return;
-        }
-      }
-
-      // 중복 방지: 이전 프레임과 동일한 요소면 통과
+      // 2. 중복 실행 방지 (이전 프레임과 동일한 요소)
       if (semEl === lastElementRef.current) return;
-      lastElementRef.current = semEl; // 현재 요소를 마지막으로 기록
+      lastElementRef.current = semEl;
 
-      // 2. 현재 요소가 타겟인지 확인
+      // 3. 타겟 여부 확인
       const isMatch = isTarget(semEl, targets);
       const currentHoverEl = currentTargetRef.current;
 
       if (isMatch) {
-        // [타겟 위]
+        // [타겟 O]
+        // 4-1. 이미 감지(잠금) 완료된 요소인지 확인
+        if (semEl === lockedElementRef.current) {
+          return; // 잠긴 요소이므로 타이머를 다시 시작하지 않음
+        }
+
+        // 4-2. 새로운 타겟에 진입했는지 확인
         if (semEl !== currentHoverEl) {
-          // 새로운 타겟 진입 (Enter)
-          onTargetLeave(); // 이전 타겟 타이머 정리
-          currentTargetRef.current = semEl; // 새 타겟 설정
+          onTargetLeave(); // (혹시 모를) 이전 타이머 정리
+          currentTargetRef.current = semEl;
           onTargetEnter(semEl!); // 새 타겟 타이머 시작
         }
-        // else: 이미 타이머가 돌고 있는 동일한 타겟임 (아무것도 안 함)
+        // (semEl === currentHoverEl 인 경우는 이미 타이머가 돌고 있으므로 아무것도 안 함)
       } else {
-        // [타겟 밖]
+        // [타겟 X]
+        // 4-3. 이전에 타겟 위에 있었다면 (이탈)
         if (currentHoverEl) {
-          // 타겟에서 방금 벗어남 (Leave)
           currentTargetRef.current = null;
-          onTargetLeave(); // 타이머 정리
+          onTargetLeave();
         }
-        // else: 원래 타겟 밖이었음 (아무것도 안 함)
       }
     };
 
-    // rAF 스케줄러
+    /** 메인 루프 스케줄러 */
     const schedule = () => {
       if (rafRef.current == null) {
         rafRef.current = requestAnimationFrame(tick);
       }
     };
 
-    // 마우스 이벤트 리스너
+    // --- 4. DOM 이벤트 리스너 ---
+
     const onMove = (e: PointerEvent) => {
       pointRef.current = { x: e.clientX, y: e.clientY };
-      schedule();
+      schedule(); // 메인 루프 실행 예약
     };
 
     const onLeave = () => {
@@ -196,24 +205,21 @@ export function useHoverDetector(
         onTargetLeave();
         currentTargetRef.current = null;
       }
-      // 참고: 창을 떠나도 '잠금'은 해제되지 않습니다.
-      // 다시 돌아와서 '다른' 요소로 이동해야 잠금이 풀립니다.
     };
 
     window.addEventListener("pointermove", onMove, { passive: true, signal });
     window.addEventListener("pointerleave", onLeave, { passive: true, signal });
 
-    // --- 클린업 ---
+    // --- 5. 클린업 ---
     return () => {
       controller.abort(); // 모든 이벤트 리스너 제거
+      cancelProgressTimer(); // 진행률 타이머 제거
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
-      cancelProgressTimer(); // 프로그레스 타이머 제거
       setHoverTime(0); // 훅 언마운트 시 스토어 초기화
     };
-    // targets 객체나 시간이 변경되면 훅을 재시작
-  }, [targets, hoverDurationMs, setHoverTime]);
+  }, [targets, hoverDurationMs, setHoverTime, setPosition]);
 
-  // 이 훅은 값을 반환하는 대신, 이펙트와 Zustand 스토어 업데이트를 수행합니다.
+  return detectedElement;
 }

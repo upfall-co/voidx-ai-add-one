@@ -24,26 +24,10 @@ export const useMessageStore = create<
 >((set) => ({
   messages: [],
   setMessages: (messages) => set({ messages }),
-
   addMessage: (newMessage) =>
-    set((state) => {
-      const newId = generateUUID();
-      const messagesToAdd: ClientMessage[] = [];
-
-      if (newMessage.type === "nudge") {
-        messagesToAdd.push({
-          ...newMessage,
-          type: "chat",
-          id: generateUUID(),
-        });
-      }
-
-      messagesToAdd.push({ ...newMessage, id: newId });
-
-      return {
-        messages: [...state.messages, ...messagesToAdd],
-      };
-    }),
+    set((state) => ({
+      messages: [...state.messages, { ...newMessage, id: generateUUID() }],
+    })),
   removeMessage: (index) =>
     set((state) => ({
       messages: state.messages.filter((_, i) => i !== index),
