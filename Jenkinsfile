@@ -37,11 +37,8 @@ pipeline {
                         
                         dir('dist') {
                             echo "Uploading ALL files from /dist to OSS bucket: ${bucketName}"
-
-                            // [디버깅 추가] dist 폴더의 모든 파일 목록을 로그에 출력합니다.
-                            echo "--- Files in dist directory ---"
-                            sh 'ls -R'
-                            echo "---------------------------------"
+                            
+                            sh 'ls -l' 
 
                             aliyunOSSUpload(
                                 accessKeyId: env.ALIYUN_KEY_ID,
@@ -49,8 +46,7 @@ pipeline {
                                 endpoint: "oss-ap-northeast-2.aliyuncs.com",
                                 bucketName: bucketName,
                                 
-                                // [수정] localPath를 '**/*' (별표 두 개)로 변경
-                                localPath: '**/*', 
+                                localPath: '*.js', 
                                 
                                 remotePath: '/'          
                             )
