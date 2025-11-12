@@ -23,8 +23,13 @@ export function useCursorFollow(
 
   useEffect(() => {
     const checkMobile = () => {
-      const mobileCheck = "ontouchstart" in window || window.innerWidth < 768;
-      setIsMobile(mobileCheck);
+      const userAgent =
+        navigator.userAgent || navigator.vendor || (window as any)?.opera;
+      setIsMobile(
+        /android|ipad|iphone|ipod|blackberry|iemobile|opera mini/i.test(
+          userAgent
+        )
+      );
     };
 
     checkMobile();
