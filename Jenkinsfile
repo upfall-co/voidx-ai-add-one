@@ -42,7 +42,7 @@ pipeline {
                                 accessKeySecret: env.ALIYUN_KEY_SECRET,
                                 endpoint: "oss-ap-northeast-2.aliyuncs.com",
                                 bucketName: bucketName,
-                                localPath: '**/*.js', 
+                                localPath: '**/*',
                                 remotePath: '/'          
                             )
                         }
