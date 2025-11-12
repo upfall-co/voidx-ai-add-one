@@ -39,7 +39,13 @@ const INTERACTIVE_ROLES = new Set([
   "searchbox",
 ]);
 
-const SECTIONING_TAGS = new Set(["SECTION", "ARTICLE", "FIGURE", "FIGCAPTION"]);
+const SECTIONING_TAGS = new Set([
+  "SECTION",
+  "ARTICLE",
+  "FIGURE",
+  "FIGCAPTION",
+  "IMG",
+]);
 
 // ===== 헬퍼 함수 (재사용 가능) =====
 export function getRole(el: Element): string | null {

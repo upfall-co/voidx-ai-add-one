@@ -35,8 +35,8 @@ export default function SmartNudgePopup() {
     [allMessages]
   );
 
-  const isOpen = useSmartPopupStore((s) => s.isOpen);
   const { x: initialX, y: initialY } = useSmartPopupStore((s) => s.position);
+  const isOpen = useSmartPopupStore((s) => s.isOpen);
   const opacity = useSmartPopupStore((s) => s.opacity);
   const isExpanded = useSmartPopupStore((s) => s.isExpanded);
   const inputValue = useSmartPopupStore((s) => s.inputValue);
@@ -47,6 +47,8 @@ export default function SmartNudgePopup() {
   const setInputValue = useSmartPopupStore((s) => s.setInputValue);
   const setOpacity = useSmartPopupStore((s) => s.setOpacity);
   const setIsPin = useSmartPopupStore((s) => s.setIsPin);
+
+  const convertNudgesToChat = useMessageStore((s) => s.convertNudgesToChat);
 
   const isChatbotOpen = useChatbotStore((s) => s.isOpen);
 
@@ -98,12 +100,12 @@ export default function SmartNudgePopup() {
     setIsHovering(false);
     setIsPin(false);
     setIsExpanded(false);
+    convertNudgesToChat();
   };
 
   const submitMessage = () => {
     const content = inputValue.trim();
     if (!content) return;
-    // 5. 메시지 전송 로직 수정 (type: 'nudge' 추가)
     addMessage({ role: "user", content, type: "nudge" });
     setInputValue("");
   };
@@ -128,6 +130,12 @@ export default function SmartNudgePopup() {
   };
 
   useEffect(() => {
+    if (lastMessage && lastMessage.type === "nudge") {
+      setIsOpen(true);
+    }
+  }, [lastMessage]);
+
+  useEffect(() => {
     if (nudgeList.length > 0 && !isPin && !isFocus && !isHovering) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
@@ -135,7 +143,7 @@ export default function SmartNudgePopup() {
       }, 5000);
     }
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      clearTimeout(timeoutRef.current);
     };
   }, [nudgeList, isPin, isFocus, isHovering, handleClose]);
 
@@ -144,9 +152,13 @@ export default function SmartNudgePopup() {
       top: messageListRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [isExpanded, nudgeList]); // 6. nudgeList 변경 시 스크롤
+  }, [isExpanded, nudgeList]);
 
-  if (!isOpen || isChatbotOpen) return null;
+  useEffect(() => {
+    if (isChatbotOpen) handleClose();
+  }, [isChatbotOpen]);
+
+  if (!isOpen) return null;
 
   return (
     <motion.div
@@ -235,10 +247,7 @@ export default function SmartNudgePopup() {
                 </MessageBubble>
               ))
             ) : (
-              <MessageBubble
-                role={lastMessage.role}
-                contentType={lastMessage.contentType}
-              >
+              <MessageBubble role={lastMessage.role} type={lastMessage.type}>
                 {lastMessage.content}
               </MessageBubble>
             )
@@ -247,7 +256,6 @@ export default function SmartNudgePopup() {
               메시지가 없습니다.
             </div>
           )}
-          {/* 7. 메시지가 1개 초과일 때만 확장 버튼 표시 */}
           {nudgeList.length > 1 && (
             <button
               className="self-center mt-2 text-black/30"

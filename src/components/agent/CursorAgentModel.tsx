@@ -1,5 +1,5 @@
 import { useCursorFollow } from "@/hooks/useCursorFollow";
-import { useInteractionStore } from "@/stores/scenarioStore";
+import { useInteractionStore } from "@/stores/interactionStore";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";

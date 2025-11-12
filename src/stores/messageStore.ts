@@ -17,6 +17,7 @@ type ClientMessageActions = {
   addMessage: (message: Omit<ClientMessage, "id">) => void;
   removeMessage: (index: number) => void;
   clearMessages: () => void;
+  convertNudgesToChat: () => void;
 };
 
 export const useMessageStore = create<
@@ -24,29 +25,19 @@ export const useMessageStore = create<
 >((set) => ({
   messages: [],
   setMessages: (messages) => set({ messages }),
-
   addMessage: (newMessage) =>
-    set((state) => {
-      const newId = generateUUID();
-      const messagesToAdd: ClientMessage[] = [];
-
-      if (newMessage.type === "nudge") {
-        messagesToAdd.push({
-          ...newMessage,
-          type: "chat",
-          id: generateUUID(),
-        });
-      }
-
-      messagesToAdd.push({ ...newMessage, id: newId });
-
-      return {
-        messages: [...state.messages, ...messagesToAdd],
-      };
-    }),
+    set((state) => ({
+      messages: [...state.messages, { ...newMessage, id: generateUUID() }],
+    })),
   removeMessage: (index) =>
     set((state) => ({
       messages: state.messages.filter((_, i) => i !== index),
     })),
   clearMessages: () => set({ messages: [] }),
+  convertNudgesToChat: () =>
+    set((state) => ({
+      messages: state.messages.map((msg) =>
+        msg.type === "nudge" ? { ...msg, type: "chat" } : msg
+      ),
+    })),
 }));

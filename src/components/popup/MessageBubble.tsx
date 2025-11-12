@@ -1,16 +1,16 @@
+import type { MessageType } from "@/types/message";
 import clsx from "clsx";
 
 export type MessageRole = "user" | "bot";
-export type ContentType = "message" | "product";
 
 export default function MessageBubble({
   role,
   children,
-  contentType,
+  type,
 }: {
   role: MessageRole;
   children: React.ReactNode;
-  contentType?: ContentType;
+  type?: MessageType;
 }) {
   const isUser = role === "user";
   const commonClass =
@@ -20,7 +20,7 @@ export default function MessageBubble({
   const botClass =
     "bg-white/45 text-black self-start rounded-lg rounded-bl-none";
 
-  if (contentType && contentType === "product") {
+  if (type === "nudge" && role === "bot") {
     return (
       <div
         className="text-sm"

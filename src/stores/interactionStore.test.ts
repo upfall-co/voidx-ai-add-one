@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { useInteractionStore } from "./scenarioStore";
+import { useInteractionStore } from "./interactionStore";
 
 describe("useInteractionStore (Zustand)", () => {
   beforeEach(() => {
