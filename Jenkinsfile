@@ -8,6 +8,24 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/upfall-co/voidx-ai-add-on.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
         stage('Upload to OSS') {
             steps {
                 script {
@@ -18,7 +36,7 @@ pipeline {
                                                      passwordVariable: 'ALIYUN_KEY_SECRET')]) {
                         
                         dir('dist') {
-                            echo "Uploading 'voidx-ai-addon.es.js' to OSS bucket: ${bucketName}"
+                            echo "Uploading ALL files from /dist to OSS bucket: ${bucketName}"
                             
                             sh 'ls -l' 
 
@@ -27,8 +45,10 @@ pipeline {
                                 accessKeySecret: env.ALIYUN_KEY_SECRET,
                                 endpoint: "oss-ap-northeast-2.aliyuncs.com",
                                 bucketName: bucketName,
-                                localPath: ' voidx-ai-addon.es.js', 
-                                remotePath: '/' 
+                                
+                                localPath: ' **/*', 
+                                
+                                remotePath: '/'          
                             )
                         }
                     }
