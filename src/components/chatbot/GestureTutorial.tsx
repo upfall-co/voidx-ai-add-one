@@ -1,14 +1,11 @@
 "use client";
 
+import { useChatbotStore } from "@/stores/chatbotStore";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useMemo } from "react";
 
-export default function GestureTutorial({
-  step,
-  isOpen,
-}: {
-  step: number;
-  isOpen: boolean;
-}) {
+export default function GestureTutorial({ step }: { step: number }) {
+  const isOpen = useChatbotStore((s) => s.isOpen);
   const variants: Variants = {
     hidden: { y: "100%", opacity: 0 },
     visible: {
@@ -53,7 +50,11 @@ export default function GestureTutorial({
     },
   };
 
-  const showTutorial = isOpen && (step === 0 || step === 2);
+  const showTutorial = useMemo(() => {
+    if (!isOpen) return false;
+    if (step === 0 || step === 2) return true;
+    return false;
+  }, [isOpen, step]);
 
   return (
     <AnimatePresence>

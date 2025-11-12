@@ -91,6 +91,7 @@ export function useHoverDetector(
 
       // 4. 스토어에 팝업 위치(현재 커서) 전송
       const pos = pointRef.current;
+      console.log(pos);
       if (pos) {
         setPosition(pos);
       }

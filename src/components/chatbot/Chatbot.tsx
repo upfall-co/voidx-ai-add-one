@@ -16,7 +16,10 @@ import { PiPaperPlaneFill } from "react-icons/pi";
 import { useSwipeable } from "react-swipeable";
 import { ArkModelScene } from "./ArkModelScene";
 import ChattingList from "./ChattingList";
+import GestureTutorial from "./GestureTutorial";
 import ChatbotToolbar from "./Toolbar";
+
+export const MAX_TUTORIAL_STEP = 1;
 
 export default function Chatbot() {
   const isOpen = useChatbotStore((s) => s.isOpen);
@@ -74,6 +77,18 @@ export default function Chatbot() {
     trackMouse: true,
   });
 
+  const isTutorialActive = useMemo(() => {
+    const getTutorialActive = localStorage.getItem("voidx_tutorial_active");
+    console.log(tutorialStep);
+    if (getTutorialActive === "false") {
+      return false;
+    }
+    if (tutorialStep >= MAX_TUTORIAL_STEP) {
+      localStorage.setItem("voidx_tutorial_active", "false");
+      return false;
+    }
+    return true;
+  }, [tutorialStep]);
   // const handlers = useSwipeable({
   //   onSwipedLeft: () => {
   //     if (mode === "sleeping") {
@@ -181,9 +196,9 @@ export default function Chatbot() {
               </Canvas>
             </Suspense>
 
-            {/* {tutorialStep < 1 && (
-              <GestureTutorial step={tutorialStep} isOpen={isOpen} />
-            )} */}
+            {isTutorialActive && (
+              <GestureTutorial step={tutorialStep}  />
+            )}
             <ChattingList />
           </div>
 
