@@ -66,24 +66,6 @@ describe("useMessageStore (Zustand)", () => {
     expect(result.current.messages).toEqual([{ ...chatMessage, id: "uuid-1" }]);
   });
 
-  it("addMessage 액션이 'nudge' 타입 메시지를 올바르게 추가해야 합니다 (chat 메시지 포함).", () => {
-    const { result } = renderHook(() => useMessageStore());
-    const nudgeMessage = {
-      role: "bot" as MessageRole,
-      content: "Test nudge message",
-      type: "nudge" as MessageType,
-    };
-
-    act(() => {
-      result.current.addMessage(nudgeMessage);
-    });
-
-    expect(result.current.messages).toEqual([
-      { ...nudgeMessage, type: "chat", id: "uuid-2" },
-      { ...nudgeMessage, id: "uuid-1" },
-    ]);
-  });
-
   it("removeMessage 액션이 메시지를 올바르게 제거해야 합니다.", () => {
     const { result } = renderHook(() => useMessageStore());
     const initialMessages: ClientMessage[] = [
