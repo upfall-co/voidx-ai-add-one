@@ -26,14 +26,17 @@ pipeline {
             }
         }
 
-        stage('Upload to OSS') {
+       stage('Upload to OSS') {
             steps {
                 script {
                     def bucketName = env.OSS_BUCKET.replace('oss://', '')
                     
-                    withCredentials([usernamePassword(credentialsId: env.ALIYUN_CREDS_ID, 
-                                                     usernameVariable: 'ALIYUN_KEY_ID', 
-                                                     passwordVariable: 'ALIYUN_KEY_SECRET')]) {
+                    // [수정] usernamePassword -> alibabaCloudAccessKey
+                    //        usernameVariable -> accessKeyVariable
+                    //        passwordVariable -> secretKeyVariable
+                    withCredentials([alibabaCloudAccessKey(credentialsId: env.ALIYUN_CREDS_ID, 
+                                                           accessKeyVariable: 'ALIYUN_KEY_ID', 
+                                                           secretKeyVariable: 'ALIYUN_KEY_SECRET')]) {
                         
                         dir('dist') {
                             echo "Uploading JS files to OSS bucket: ${bucketName}"
@@ -41,13 +44,9 @@ pipeline {
                             aliyunOSSUpload(
                                 accessKeyId: env.ALIYUN_KEY_ID,
                                 accessKeySecret: env.ALIYUN_KEY_SECRET,
-                                
-                                endpoint: "oss-ap-northeast-2.aliyuncs.com", 
-                                
-                                bucketName: bucketName, 
-                                
+                                endpoint: "oss-ap-northeast-2.aliyuncs.com",
+                                bucketName: bucketName,
                                 localPath: '**/*.js',
-                                
                                 remotePath: '/'          
                             )
                         }
