@@ -1,11 +1,12 @@
 pipeline {
     agent any 
 
-   environment {
+    environment {
         OSS_BUCKET = 'oss://voidx-ai-add-on' 
         CDN_DOMAIN = 'https://addon-cdn.voidx.ai'
-        ALIYUN_CREDS_ID = 'aliyun-oss-creds' 
+        ALIYUN_CREDS_ID = 'aliyun-oss-creds'
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -25,19 +26,31 @@ pipeline {
             }
         }
 
-       stage('Upload to OSS') {
+        stage('Upload to OSS') {
             steps {
                 script {
                     def bucketName = env.OSS_BUCKET.replace('oss://', '')
-                    dir('dist') {
-                        echo "Uploading JS files to OSS bucket: ${bucketName}"
+                    
+                    withCredentials([usernamePassword(credentialsId: env.ALIYUN_CREDS_ID, 
+                                                     usernameVariable: 'ALIYUN_KEY_ID', 
+                                                     passwordVariable: 'ALIYUN_KEY_SECRET')]) {
+                        
+                        dir('dist') { // 2. dist 디렉토리 내부에서 실행
+                            echo "Uploading JS files to OSS bucket: ${bucketName}"
 
-                        aliyunOSSUpload(
-                            credentialsId: env.ALIYUN_CREDS_ID, 
-                            bucketName: bucketName,   
-                            filesPath: '**/*.js',   
-                            targetPath: '/'          
-                        )
+                            aliyunOSSUpload(
+                                accessKeyId: env.ALIYUN_KEY_ID,
+                                accessKeySecret: env.ALIYUN_KEY_SECRET,
+                                
+                                endpoint: "oss-ap-northeast-2.aliyuncs.com"
+                                
+                                bucketName: "voidx-ai-add-on",   
+                                
+                                localPath: '**/*.js',   
+                                
+                                remotePath: '/'          
+                            )
+                        }
                     }
                 }
             }
