@@ -126,7 +126,7 @@ export function useStableWander(
     g.position.y = bounds.min.y;
     g.updateMatrixWorld(); // 부모가 matrixAutoUpdate=false여도 안전하게
 
-    // ✅ 여기부터 추가: bounds 밖으로는 못 나가게 하드 클램프 + 반사
+    //  bounds 밖으로는 못 나가게 하드 클램프 + 반사
     if (g.position.x <= bounds.min.x || g.position.x >= bounds.max.x) {
       g.position.x = THREE.MathUtils.clamp(
         g.position.x,

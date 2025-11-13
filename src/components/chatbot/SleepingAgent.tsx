@@ -19,7 +19,7 @@ const OBSTACLES: THREE.Vector3[] = [
   // new THREE.Vector3(0.79, FLOOR_Y, 0.66),
 
   // // book: x: -0.6840, z: -0.6574  (소파 쪽)
-  // new THREE.Vector3(-0.68, FLOOR_Y, -0.66),
+  new THREE.Vector3(-0.68, FLOOR_Y, -0.66),
 
   // bookshelf: x: 0.0687, z: -0.8221
   // new THREE.Vector3(0.07, FLOOR_Y, -0.82),
