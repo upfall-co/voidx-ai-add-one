@@ -1,5 +1,7 @@
 import { cdnUrl } from "@/constant/common";
-import { act, renderHook } from "@testing-library/react";
+import { renderHook } from "@testing-library/react"; // 1. renderHook만 가져옵니다.
+import { act } from "react"; // 2. 'act'는 'react'에서 직접 가져옵니다.
+import { describe, expect, it } from "vitest";
 import { useChatbotStore } from "./chatbotStore";
 
 describe("useChatbotStore (Zustand)", () => {

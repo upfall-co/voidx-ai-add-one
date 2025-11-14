@@ -1,5 +1,7 @@
 import { cdnUrl } from "@/constant/common";
-import { act, renderHook } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
+import { act } from "react";
+import { describe, expect, it } from "vitest";
 import { useAgentStore } from "./agentStore";
 
 describe("useAgentStore (Zustand)", () => {
