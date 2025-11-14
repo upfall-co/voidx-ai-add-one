@@ -9,13 +9,14 @@ import DonutGauge from "./agent/DonutGauge";
 import Chatbot from "./chatbot/Chatbot";
 import SmartNudgePopup from "./popup/SmartNudgePopup";
 
-/** index html 기준 목업된 타겟
- * 추후 API로부터 리스트 전달받아서 HoverTargets 형태로 전처리
- */
-
 const MY_TARGETS: HoverTargets = {
+  classNames: ["product-item", "e-product-card"],
   ids: [],
-  classNames: ["product-item"],
+  idPatterns: [
+    /^product-[A-Za-z0-9]+$/, // r'^product-[A-Za-z0-9]+$'
+    /product-\w+/, // r'product-\w+'
+  ],
+  classNamePatterns: [],
 };
 
 export default function VoidxProvider() {
