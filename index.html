@@ -4,16 +4,115 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SDK 테스트 페이지</title>
+    <title>SDK 테스트 페이지 (쇼핑몰)</title>
+    <style>
+      /* 쇼핑몰 템플릿을 위한 기본 스타일 */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      .product-list-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+      .product-list-container h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+      }
+      /* 상품 리스트 (Flexbox 컨테이너) */
+      .product-list {
+        display: flex;
+        justify-content: center; /* 아이템 중앙 정렬 */
+        gap: 25px; /* 아이템 간 간격 */
+        flex-wrap: wrap; /* 화면이 작아지면 줄바꿈 */
+      }
+
+      /* 요청하신 "통일된 클래스" */
+      .product-item {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        width: 280px; /* 카드 너비 고정 */
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .product-item:hover {
+        transform: translateY(-5px); /* 호버 시 살짝 위로 이동 */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      }
+      .product-item img {
+        width: 100%;
+        height: 200px; /* 이미지 높이 고정 */
+        object-fit: cover; /* 이미지 비율 유지하며 채우기 */
+        border-radius: 4px;
+        margin-bottom: 15px;
+      }
+      .product-item h3 {
+        font-size: 1.15rem;
+        margin: 10px 0;
+        color: #333;
+      }
+      .product-item .price {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 15px;
+      }
+      .product-item button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.2s;
+      }
+      .product-item button:hover {
+        background-color: #218838;
+      }
+    </style>
   </head>
   <body style="background: #f1f1f1">
-    <h1>TEST SITE</h1>
-    <div style="display: flex; flex-direction: column; gap: 16px">
-      <button style="width: 100px">클릭 이벤트</button>
-      <img
-        src="https://images.unsplash.com/photo-1762119594508-b9be29cd513d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2223"
-        style="width: 20vw"
-      />
+    <div class="product-list-container">
+      <h2>Featured Products</h2>
+      <div class="product-list">
+        <div class="product-item">
+          <img
+            src="https://images.unsplash.com/photo-1762119594508-b9be29cd513d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2223"
+            alt="Product 1"
+          />
+          <h3>Premium Blend Coffee</h3>
+          <p class="price">$19.99</p>
+          <button>Add to Cart</button>
+        </div>
+
+        <div class="product-item">
+          <img
+            src="https://images.unsplash.com/photo-1762119594508-b9be29cd513d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2223"
+            alt="Product 2"
+          />
+          <h3>Wireless Earbuds</h3>
+          <p class="price">$79.50</p>
+          <button>Add to Cart</button>
+        </div>
+
+        <div class="product-item">
+          <img
+            src="https://images.unsplash.com/photo-1762119594508-b9be29cd513d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2223"
+            alt="Product 3"
+          />
+          <h3>Leather Notebook</h3>
+          <p class="price">$24.00</p>
+          <button>Add to Cart</button>
+        </div>
+      </div>
     </div>
 
     <div id="voidx-ai-addon-root"></div>
