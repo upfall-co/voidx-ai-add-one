@@ -1,5 +1,6 @@
 import type { ClientMessage, MessageRole, MessageType } from "@/types/message";
-import { act, renderHook } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
+import { act } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { useMessageStore } from "./messageStore";
 // 가짜 UUID 생성 함수 설정

@@ -1,3 +1,5 @@
+import "react-dom/test-utils";
+
 import { cdnUrl } from "@/constant/common";
 import { useChatbotStore } from "@/stores/chatbotStore";
 import * as matchers from "@testing-library/jest-dom/matchers";

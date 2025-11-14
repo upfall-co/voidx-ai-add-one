@@ -1,11 +1,11 @@
 export default {
   printWidth: 80,
   singleQuote: true,
-  trailingComma: 'all',
+  trailingComma: "all",
   tabWidth: 2,
   bracketSameLine: true,
   bracketSpacing: true,
   jsxBracketSameLine: true,
-  arrowParens: 'always',
+  arrowParens: "always",
   endOfLine: 'auto',
 };
