@@ -1,9 +1,7 @@
-import js from "@eslint/js";
 import prettier from "eslint-plugin-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
-import tseslint from "typescript-eslint";
 
 export default defineConfig([
   globalIgnores(["dist"]),
@@ -28,14 +26,7 @@ export default defineConfig([
         "warn",
         { allowConstantExport: true },
       ],
-      "prettier/prettier": [
-        "warn",
-        {
-          singleQuote: true,
-          jsxSingleQuote: false,
-          endOfLine: "auto",
-        },
-      ],
+      "prettier/prettier": "warn",
     },
   },
 ]);

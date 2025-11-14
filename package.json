@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run test && tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -13,6 +13,10 @@
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage"
   },
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/voidx-ai-addon.es.js",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
