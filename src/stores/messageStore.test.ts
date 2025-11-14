@@ -1,7 +1,6 @@
 import type { ClientMessage, MessageRole, MessageType } from "@/types/message";
-import { renderHook } from "@testing-library/react"; // 1. renderHook만 가져옵니다.
-import { act } from "react"; // 2. 'act'는 'react'에서 직접 가져옵니다.
-import { describe, expect, it } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
 import { useMessageStore } from "./messageStore";
 // 가짜 UUID 생성 함수 설정
 const mockUUIDs = ["uuid-1", "uuid-2", "uuid-3", "uuid-4", "uuid-5"];
@@ -28,7 +27,6 @@ Object.defineProperty(globalThis.crypto, "randomUUID", {
 
 describe("useMessageStore (Zustand)", () => {
   beforeEach(() => {
-    // Reset the store and uuidIndex before each test
     act(() => {
       useMessageStore.setState({ messages: [] });
     });

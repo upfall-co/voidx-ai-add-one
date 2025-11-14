@@ -1,11 +1,12 @@
-// src/tests/setup.ts
-
 import { cdnUrl } from "@/constant/common";
 import { useChatbotStore } from "@/stores/chatbotStore";
-import "@testing-library/jest-dom";
-import { useAgentStore } from "../stores/agentStore"; // 1. 테스트할 스토어 임포트
+import * as matchers from "@testing-library/jest-dom/matchers";
+import { beforeEach, expect } from "vitest";
 
-// 2. Zustand 스토어의 상태를 초기값으로 리셋
+expect.extend(matchers);
+
+import { useAgentStore } from "../stores/agentStore";
+
 beforeEach(() => {
   useAgentStore.setState({
     preview: "",
