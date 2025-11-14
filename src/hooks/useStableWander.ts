@@ -104,9 +104,10 @@ export function useStableWander(
       const center = vDesired
         .copy(bounds.min)
         .add(bounds.max)
-        .multiplyScalar(0.5);
+        .multiplyScalar(0.5); // 방 중심점
+
       const half = vAvoid.copy(bounds.max).sub(bounds.min).multiplyScalar(0.5);
-      const off = vAvoid.copy(g.position).sub(center);
+      const off = vAvoid.copy(g.position).sub(center); // 에이전트 위치 - 방 중심
       if (Math.abs(off.x) > half.x || Math.abs(off.z) > half.z) {
         vTarget.add(center.sub(g.position).multiplyScalar(0.8));
       }
@@ -145,24 +146,50 @@ export function useStableWander(
       vel.current.z *= -1; // z 방향 반전
     }
 
+    // // (8) 진행방향을 바라보도록 회전
+    // const dir =
+    //   vel.current.lengthSq() > 1e-6
+    //     ? vel.current.clone().normalize()
+    //     : vForward;
+    // // dir을 바라보는 로컬 회전 만들기
+    // // dir.negate();
+    // const m = new THREE.Matrix4().lookAt(new THREE.Vector3(0, 0, 0), dir, vUp);
+
+    // qDesired.setFromRotationMatrix(m);
+    // g.quaternion.slerp(qDesired, Math.min(1, turnRate * dt));
+
+    // if (onSpeedChange) {
+    //   const s = vel.current.length();
+    //   if (Math.abs(s - prevSpeed.current) > 0.02) {
+    //     onSpeedChange(s);
+    //     prevSpeed.current = s;
+    //   }
+    // }
     // (8) 진행방향을 바라보도록 회전
     const dir =
       vel.current.lengthSq() > 1e-6
         ? vel.current.clone().normalize()
         : vForward;
-    // dir을 바라보는 로컬 회전 만들기
-    // dir.negate();
-    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(0, 0, 0), dir, vUp);
 
+    // y축 회전만 신경 쓰기 위해, 수평(XZ) 방향만 사용
+    dir.y = 0;
+    if (dir.lengthSq() < 1e-6) {
+      // 너무 작으면 기본 전방(-Z) 사용
+      dir.set(0, 0, -1);
+    }
+    dir.normalize();
+
+    // 1) lookAt으로 qDesired 만들고
+    const m = new THREE.Matrix4().lookAt(new THREE.Vector3(0, 0, 0), dir, vUp);
     qDesired.setFromRotationMatrix(m);
+
+    // 2) slerp로 부드럽게 보간
     g.quaternion.slerp(qDesired, Math.min(1, turnRate * dt));
 
-    if (onSpeedChange) {
-      const s = vel.current.length();
-      if (Math.abs(s - prevSpeed.current) > 0.02) {
-        onSpeedChange(s);
-        prevSpeed.current = s;
-      }
-    }
+    // 3) pitch/roll 제거: 항상 수직으로 세우기
+    const e = new THREE.Euler().setFromQuaternion(g.quaternion, "YXZ");
+    e.x = 0;
+    e.z = 0;
+    g.quaternion.setFromEuler(e);
   });
 }
