@@ -20,11 +20,18 @@ import {
 import { PiPaperPlaneFill } from "react-icons/pi";
 import MessageBubble from "./MessageBubble";
 
-const popupSize = { width: 400, height: 400 };
+const popupSize = { width: 400, height: 620 };
 const estimatedWidth = popupSize.width;
 const estimatedHeight = popupSize.height;
 
 export default function SmartNudgePopup() {
+  const popupRef = useRef<HTMLDivElement | null>(null);
+  const [dragBounds, setDragBounds] = useState({
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  });
   // 2. messageStore에서 메시지 가져오기
   const allMessages = useMessageStore((s) => s.messages);
   const addMessage = useMessageStore((s) => s.addMessage); // 3. addMessage 가져오기
@@ -130,6 +137,39 @@ export default function SmartNudgePopup() {
   };
 
   useEffect(() => {
+    const updateBounds = () => {
+      const { innerWidth, innerHeight } = window;
+
+      // 팝업 실제 DOM 크기 가져오기
+      const rect = popupRef.current?.getBoundingClientRect();
+
+      // 실제 크기 있으면 그거 사용, 없으면 예측값 사용
+      const width = rect?.width ?? estimatedWidth;
+      const height = rect?.height ?? estimatedHeight;
+
+      const maxX = innerWidth - margin - width;
+      const maxY = innerHeight - margin - height;
+
+      setDragBounds({
+        left: margin - initialLeft,
+        right: maxX - initialLeft,
+        top: margin - initialTop,
+        bottom: maxY - initialTop,
+      });
+    };
+
+    if (isOpen) {
+      updateBounds();
+      window.addEventListener("resize", updateBounds);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateBounds);
+    };
+    // 팝업 열림/닫힘, 위치, 내용 양 바뀔 때마다 다시 계산
+  }, [initialLeft, initialTop, isOpen, isExpanded, nudgeList.length]);
+
+  useEffect(() => {
     if (lastMessage && lastMessage.type === "nudge") {
       setIsOpen(true);
     }
@@ -162,6 +202,7 @@ export default function SmartNudgePopup() {
 
   return (
     <motion.div
+      ref={popupRef}
       layout
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -173,6 +214,7 @@ export default function SmartNudgePopup() {
       drag={!isPin}
       dragListener={false}
       dragControls={dragControls}
+      dragConstraints={dragBounds}
       dragMomentum={false}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: opacity, y: 0, scale: 1 }}
