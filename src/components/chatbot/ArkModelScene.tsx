@@ -6,6 +6,7 @@ import { useGLTF } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import { SkeletonUtils } from "three-stdlib";
+import * as THREE from "three";
 import SleepingAgentModel from "./SleepingAgent";
 
 const arkUrl = `${cdnUrl}/3d/ark_model_00.glb`;
@@ -37,6 +38,25 @@ export function ArkModelScene() {
       }
       if (o.visible === false) o.visible = true;
       if (o.frustumCulled) o.frustumCulled = false;
+    });
+  }, [cloned]);
+
+  useEffect(() => {
+    const worldPos = new THREE.Vector3();
+
+    // 월드 행렬 먼저 업데이트
+    cloned.updateWorldMatrix(true, true);
+
+    cloned.traverse((o: any) => {
+      if (o.isMesh) {
+        o.getWorldPosition(worldPos);
+
+        console.log("[MESH WORLD]", "name:", o.name || "(no-name)", "pos:", {
+          x: worldPos.x,
+          y: worldPos.y,
+          z: worldPos.z,
+        });
+      }
     });
   }, [cloned]);
 

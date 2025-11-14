@@ -5,6 +5,7 @@ interface AppProps {
   apiKey?: string;
 }
 
+
 export default function App({ apiKey }: AppProps) {
   useEffect(() => {
     console.log(apiKey);

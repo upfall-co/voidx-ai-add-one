@@ -126,6 +126,25 @@ export function useStableWander(
     g.position.y = bounds.min.y;
     g.updateMatrixWorld(); // 부모가 matrixAutoUpdate=false여도 안전하게
 
+    //  bounds 밖으로는 못 나가게 하드 클램프 + 반사
+    if (g.position.x <= bounds.min.x || g.position.x >= bounds.max.x) {
+      g.position.x = THREE.MathUtils.clamp(
+        g.position.x,
+        bounds.min.x,
+        bounds.max.x
+      );
+      vel.current.x *= -1; // 벽에 부딪힌 것처럼 x 방향 반전
+    }
+
+    if (g.position.z <= bounds.min.z || g.position.z >= bounds.max.z) {
+      g.position.z = THREE.MathUtils.clamp(
+        g.position.z,
+        bounds.min.z,
+        bounds.max.z
+      );
+      vel.current.z *= -1; // z 방향 반전
+    }
+
     // (8) 진행방향을 바라보도록 회전
     const dir =
       vel.current.lengthSq() > 1e-6
